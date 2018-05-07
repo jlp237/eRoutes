@@ -19,6 +19,8 @@ list_length = len(urls)
 
 #loop takes about 10 minutes
 
+#test for github  1
+
 
 for x in range(list_length):
     page_link ='https://ev-database.uk' + urls[x]
