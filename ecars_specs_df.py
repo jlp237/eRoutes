@@ -25,7 +25,7 @@ import pandas as pd
 list_length = len(urls)
 table = pd.DataFrame()
 
-for x in range(list_length):
+for x in range(10):
     page_link ='https://ev-database.uk' + urls[x]
              
     for i in range(0,10):
@@ -40,7 +40,7 @@ for x in range(list_length):
         
         next_table[3] = cars[x]   
         table = table.append(next_table, ignore_index = True)
-        print('in progress.... ' + x + '/63' + cars[x])
+        print('in progress.... ' + cars[x])
 
 #transform dataframe 
 table_transformed = table.set_index([3,0])[1].unstack().rename_axis([None])
@@ -52,7 +52,7 @@ table_selected = table_transformed[['Battery Capacity', 'Charge Port', 'Charge P
                                     'Range', 'Top Speed', 'Total Power', 'Vehicle Consumption', ]]
 
 #save as csv
-table_selected.to_csv('cars4.csv', sep=';', encoding='utf-8')
+table_selected.to_csv('cars5.csv', sep=';', encoding='utf-8')
 
 
 #read csv
