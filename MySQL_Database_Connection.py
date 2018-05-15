@@ -6,10 +6,12 @@ Created on Tue May 15 12:32:53 2018
 @author: vancura
 """
 
-# USER and PASSWORD need to be replaced
+### USER and PASSWORD need to be replaced
+### Consider HTW-VPN to be activated
 
 
 # importing mysql connector package
+# code examples: https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html
 
 import mysql.connector    
 
