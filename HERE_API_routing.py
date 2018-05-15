@@ -26,16 +26,43 @@ destination_coord = geocoder(destination)
 def here_route(start_coord, destination_coord):
     r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
     route = r.json()
-    routeFrame = pd.DataFrame(route)  
-    return routeFrame
+    return route
 
-routeFrame = here_route(start_coord,destination_coord)
+route = here_route(start_coord,destination_coord)
 
-
-
-
+whole_trip_length_in_km = (route['response']['route'][0]['summary']['distance'])/1000
+whole_trip_time_in_h = round((route['response']['route'][0]['summary']['baseTime'])/3600,3)
 
 
+waypoints = []
+lat_wp = []
+lon_wp = []
+
+
+for x in range(len(route['response']['route'][0]['leg'][0]['maneuver'])):
+    wp = route['response']['route'][0]['leg'][0]['maneuver'][x]['length']
+    lat = route['response']['route'][0]['leg'][0]['maneuver'][x]['position']['latitude']
+    lon = route['response']['route'][0]['leg'][0]['maneuver'][x]['position']['longitude']
+    waypoints.append(wp)
+    lat_wp.append(lat)
+    lon_wp.append(lon)
+
+
+waypoints_with_coordinates = pd.DataFrame(
+    {'waypoints': waypoints,
+     'lat_wp': lat_wp,
+     'lon_wp': lon_wp
+    })
+
+    
+
+    
+    
+
+battery_level_at_start = 0.8
+maximumRangeOfCar = 200
+temparature = 20.0
+security_puffer_in_km = 50 
 
 
 
@@ -43,29 +70,14 @@ routeFrame = here_route(start_coord,destination_coord)
 
 
 
-days = []
-prices = []
-
-for i in range(len(routeFrame['dataset'][3])):
-    day = routeFrame['dataset'][3][i][0]
-    price = routeFrame['dataset'][3][i][2]
-    days.append(day)
-    prices.append(price)
-
-df = pd.DataFrame(prices, days)
-
-import matplotlib.pyplot as plt
-
-plt.plot(days,prices)
-plt.show()
 
 
-view 
-value? 
-reuslt
-value? 
-location
-NavigationPosition
-value?
-lat
-LONG
+distance_from_center = 'https://isoline.route.cit.api.here.com/routing/7.2/calculateisoline.json?mode=fastest;car;traffic:disabled&start=52.5160,13.3778&rangetype=distance&range=200000&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA'
+
+import geopy.distance
+coords_1 = (52.2296756, 21.0122287)
+coords_2 = (52.406374, 16.9251681)
+dist = geopy.distance.distance(coords_1, coords_2).km
+
+
+
