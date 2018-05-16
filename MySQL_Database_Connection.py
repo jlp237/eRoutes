@@ -9,7 +9,7 @@ Created on Tue May 15 12:32:53 2018
 ### USER and PASSWORD need to be replaced
 ### Consider HTW-VPN to be activated
 
-
+# conda install -c anaconda mysql-connector-python
 # importing mysql connector package
 # code examples: https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-select.html
 
