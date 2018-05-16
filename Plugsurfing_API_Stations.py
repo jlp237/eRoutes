@@ -102,3 +102,26 @@ for i in range(maxGroup):
     tempStations = list()
     groupCount = groupCount + 1
 
+## Step 3 - Store all information in MySQL database "stations" in table "plugsurfing"
+ 
+# connection to HTW Mobility MySQL - DB and preset stations as database
+
+connection = mysql.connector.connect(user='USER', password='PASSWORD',
+                              host='mobility.f4.htw-berlin.de',
+                              database='stations')
+
+# try / finally for potential erros in SQL queries
+
+try:
+   cursor = connection.cursor()
+   for i, r in stationPrices.iterrows():
+       insertString = ("insert into plugsurfing (station_id, latitude, longitude,"
+                                        " type, charging_speed,"
+                                        " charging_per_kwh) values "
+                                        "(%s, %s, %s, %s, %s, %s)")
+       data = (r['Station_ID'], r['Latitude'], r['Longitude'], r['Type'], 
+               r['Charging_Speed'], r['Charging_per_kwh'])
+       cursor.execute(insertString, data)
+finally:
+    connection.commit()
+    connection.close()
