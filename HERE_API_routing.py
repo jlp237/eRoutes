@@ -105,10 +105,9 @@ radius_coordinates_with_distances_from_center = pd.DataFrame(
      'radius_coordinates': radius_coordinates
     })
 
-import geopy.distance
-coords_1 = (52.2296756, 21.0122287)
-coords_2 = (52.406374, 16.9251681)
 dist = geopy.distance.distance(coords_1, coords_2).km
+min_dist = radius_coordinates_with_distances_from_center.loc[radius_coordinates_with_distances_from_center['distances_from_center'].idxmin()]
+min_dist['radius_coordinates']
 
 
 
