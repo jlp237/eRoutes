@@ -40,22 +40,64 @@ for x in range(list_length):
         
         next_table[3] = cars[x]   
         table = table.append(next_table, ignore_index = True)
-        print('in progress.... ' + x + '/63' + cars[x])
+        print('in progress.... ' + cars[x])
 
 #transform dataframe 
-table_transformed = table.set_index([3,0])[1].unstack().rename_axis([None])
+t2= table.drop_duplicates(keep=False)
+t3 = t2[~t2.index.duplicated(keep='first')]
+t4 = t2.set_index([3,0])[1]
+t5 = t4[~t4.index.duplicated(keep='first')]
+t6 = t5.unstack()
+
+#table_transformed = table.set_index([3,0])[1].unstack().rename_axis([None])
 
 #select useful colums
-table_selected = table_transformed[['Battery Capacity', 'Charge Port', 'Charge Power', 
+table_selected = t6[['Battery Capacity', 'Charge Port', 'Charge Power', 
                                     'Charge Speed', 'Combined - Cold Weather', 'Combined - Mild Weather', 
-                                    'Drive', 'Electric Range', 'Fastcharge Port', 'Fastcharge Power', 
-                                    'Range', 'Top Speed', 'Total Power', 'Vehicle Consumption', ]]
+                                    'Drive', 'Fastcharge Port', 'Fastcharge Power', 
+                                    'Range', 'Top Speed', 'Total Power', 'Vehicle Consumption', 
+                                    'Acceleration 0 - 62 mph', 
+]]
 
 #save as csv
-table_selected.to_csv('cars4.csv', sep=';', encoding='utf-8')
+table_selected.to_csv('eCars.csv', sep=';', encoding='utf-8')
 
 
 #read csv
-cars_frame = pd.read_csv('cars4.csv',sep=';')
-print(cars_frame[1][3])
+
+x = 'Porsche'
+print(cars_frame[1:])
+
+cars_frame = pd.read_csv('cars.csv',sep=';')
+frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
+car_data = (frame2.loc[x]['Range'])
+car_range = car_data['Range']
+
+#Select all cars in list
+print(frame2['Range'])
+print(cars_frame['Car'])
+
+#Get list of all cars from csv
+import pandas as pd
+cars_frame = pd.read_csv('cars.csv',sep=';')
+cars_list = cars_frame["Car"].tolist()
+range_list = cars_frame["Range"].tolist()
+
+#Get Range from Car X
+import pandas as pd
+x = 'Prosche'
+cars_frame = pd.read_csv('cars.csv',sep=';')
+frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
+car_data = (frame2.loc[x]['Range'])
+
+car_model = 'Bmw'
+cars_frame = pd.read_csv("C:/Users/David/Desktop/cars.csv", sep=';')
+frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
+car_range = (frame2.loc[car_model]['Top Speed'])
+
+
+
+
+
+
 
