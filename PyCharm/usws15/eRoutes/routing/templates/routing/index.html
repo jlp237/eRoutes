@@ -1,0 +1,107 @@
+{% extends "routing/header.html" %}
+
+{% block content %}
+
+
+<div id = "menu">
+
+<!-- INPUT -->
+    <div id = "input">
+        <div id="car_img"><img id='theImg' src='/static/img/Porsche-Mission-E.jpg' class='\responsive-img\' style='width:100%;height:250px;'/></div>
+        <hr>
+
+
+         <form action="/output/" method="post" id="post-form">
+             {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="start">Start</label>
+                <input type="text" class="form-control" name="start" id="start" placeholder="" value="" required>
+                <div class="invalid-feedback">
+                  Valid start is required.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="destination">Destination</label>
+                <input type="text" class="form-control" name="destination" id="destination" placeholder="" value="" required>
+                <div class="invalid-feedback">
+                  Valid last destination is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-5 mb-3">
+                <label for="car">Car Model</label>
+                <select class="custom-select d-block w-100" name="car" id="car" onchange="display(this.value)">
+                     <option value="Porsche-Mission-E">Porsche-Mission-E</option>
+                    {% for car in cars_list%}
+                        <option value="{{ car }}">{{ car }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select a car.
+                </div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label for="driving_style">Driving Style</label>
+                <select class="custom-select d-block w-100" name="driving_style" id="driving_style">
+                  <option value="Normal">Normal</option>
+                  <option value="Fast">Fast</option>
+                  <option value="Slow">Slow</option>
+                </select>
+                <div class="invalid-feedback">
+                  Please provide a valid driving style.
+                </div>
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <label for="battery_status">Battery Status</label>
+                <input type="text" class="form-control" name="battery_status" id="battery_status" value="100" placeholder="100">
+                <div class="invalid-feedback">
+                  Zip code required.
+                </div>
+              </div>
+            </div>
+             <br><br>
+
+ <div class="col-md-12 mb-3">
+     <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Range</th>
+              <th scope="col">Capacity</th>
+              <th scope="col">0-100</th>
+              <th scope="col">T-Speed</th>
+              <th scope="col">Power</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div id="range">280 mi</div></td>
+              <td><div id="battery">90.0 kWh</div></td>
+              <td><div id="acceleration">3.5 sec</div></td>
+              <td><div id="speed">155 mph</div></td>
+              <td><div id="power">440 kW (590 hp)</div></td>
+            </tr>
+          </tbody>
+    </table>
+</div>
+            <button class="start_btn btn btn-primary btn-lg btn-block" type="submit">Start</button>
+            <!--<div class="alert alert-danger" role="alert">Error Message</div>-->
+          </form>
+
+    </div>
+</div>
+
+
+
+
+
+
+<!-- Implementation Map -->
+{% include "routing/includes/navigation.html" %}
+
+
+{% endblock %}

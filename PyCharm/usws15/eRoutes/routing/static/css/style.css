@@ -1,0 +1,62 @@
+*{
+    margin:0px;
+    padding:0px;
+
+}
+
+
+#menu{
+    height:800px;
+    width: 40%;
+    float:left;
+    overflow: hidden;
+}
+
+#input{
+     padding:20px;
+}
+
+#output{
+     padding:20px;
+}
+
+#navigation{
+    height:700px;
+    width: 810px;
+    background-color: lightgrey;
+    float: left;
+}
+
+#navigation2{
+    max-height:100%;
+    width: 60%;
+    background-color: lightgrey;
+    float: left;
+}
+
+#map{
+    height:700px;
+    width:100%;
+    background-color:black;
+    float: left;
+}
+
+#map2{
+    height:1000px;
+    width:100%;
+    background-color:black;
+    float: left;
+}
+
+
+
+
+#ex1Slider .slider-selection {
+	background: #BABABA;
+}
+
+.hideme
+{
+    display:none;
+    visibility:hidden;
+}
