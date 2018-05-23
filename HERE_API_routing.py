@@ -32,57 +32,67 @@ route = here_route(start_coord,destination_coord)
 whole_trip_length_in_km = (route['response']['route'][0]['summary']['distance'])/1000
 whole_trip_time_in_h = round((route['response']['route'][0]['summary']['baseTime'])/3600,3)
 
+# api call for getting the shape of route
 
+def route_shape(start_coord, destination_coord):
+    r = requests.get('https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:enabled&routeattributes=shape&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
+    route = r.json()
+    return route
 
-waypoints_0 = []
-lat_wp = []
-lon_wp = []
+route_shape = route_shape(start_coord,destination_coord)
 
+# get lat/ lon of route shape 
 
-for x in range(len(route['response']['route'][0]['leg'][0]['maneuver'])):
-    wp = route['response']['route'][0]['leg'][0]['maneuver'][x]['length']
-    lat = route['response']['route'][0]['leg'][0]['maneuver'][x]['position']['latitude']
-    lon = route['response']['route'][0]['leg'][0]['maneuver'][x]['position']['longitude']
-    waypoints_0.append(wp)
-    lat_wp.append(lat)
-    lon_wp.append(lon)
-#
-#
-waypoints_with_coordinates = pd.DataFrame(
-    {
-     'lat_wp': lat_wp,
-     'lon_wp': lon_wp
-    })
+lat_lon_1 = []
+
+for x in range(len(route_shape['response']['route'][0]['shape'])):
+    lat_lon = route_shape['response']['route'][0]['shape'][x]
+    lat_lon_1.append(lat_lon)
+ 
     
-battery_level_at_start = 0.8
-maximumRangeOfCar = 200000
-temparature = 20.0
-security_puffer_in_km = 50 
+# delete every second shape several times to reduce size  
+# to do : write a loop that the list isnt too small (like only 10 elements, minimum elements = 160 ? )
+    
+del lat_lon_1[::2]
+del lat_lon_1[::2]
+del lat_lon_1[::2]
+del lat_lon_1[::2]
+del lat_lon_1[::2]
 
-#
-#i = 0 
-#dist = 0 
-#
-#while dist <= maximumRangeOfCar - waypoints_with_coordinates['waypoints'][i+1]:
-#    dist = dist + waypoints_with_coordinates['waypoints'][i]
-#    i += 1
-#    
-#first_stop_lat = waypoints_with_coordinates['lat_wp'][i]
-#first_stop_lon = waypoints_with_coordinates['lon_wp'][i]
+del lat_lon_1[0:40]
+
+    
+# convert to string
+string_route_shapes = '|'.join(lat_lon_1)
+string_route_shapes = '[' + string_route_shapes + ']'    
+
+    
+# parse shape to corridor api / is shape too big? / convert into polyline encoding of here maps
+      
+corridor_width = 1000
+size_of_results = 100
+
+def get_stations_along_route(string_route_shapes,corridor_width, size_of_results):
+    r = requests.get('https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&route=' +string_route_shapes + ';w=' + str(corridor_width)+ '&cat=ev-charging-station&size='+ str(size_of_results))
+    stations = r.json()
+    return stations
 
 
+stations_along_route = get_stations_along_route(string_route_shapes,corridor_width, size_of_results)
 
 
-def coordinates_from_center(start, range_from_center):
-    r = requests.get('https://isoline.route.cit.api.here.com/routing/7.2/calculateisoline.json?mode=fastest;car;traffic:disabled&start='+ start +'&rangetype=distance&range=' + range_from_center + '&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
+# now calculate the nearest station of a radius of the range of the car (radius from the start-coordinates)
+
+
+def coordinates_from_center(start, maximumRangeOfCar):
+    r = requests.get('https://isoline.route.cit.api.here.com/routing/7.2/calculateisoline.json?mode=fastest;car;traffic:disabled&start='+ start +'&rangetype=distance&range=' + maximumRangeOfCar + '&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
     radius = r.json()
     return radius
 
-range_in_m = 200000
+maximumRangeOfCar = 200000
+radius = coordinates_from_center(start_coord,str(maximumRangeOfCar))
 
-#start_coord = geocoder(start)
 
-radius = coordinates_from_center(start_coord,str(range_in_m))
 radius_coordinates = []
 for x in range(len(radius['response']['isoline'][0]['component'][0]['shape'])):
     radius_coordinate = radius['response']['isoline'][0]['component'][0]['shape'][x]
@@ -96,9 +106,6 @@ for x in range(len(radius_coordinates)):
     dist = geopy.distance.distance(coords_1, coords_2).km
     distances_from_center.append(dist)
 
-    
-    
-    
 radius_coordinates_with_distances_from_center = pd.DataFrame(
     {
      'distances_from_center': distances_from_center,
@@ -109,68 +116,97 @@ min_dist = radius_coordinates_with_distances_from_center.loc[radius_coordinates_
 first_center_spot = min_dist['radius_coordinates']
 
 
+# to do : compare first_center_spot with list of stations = nearest with geopy distance. 
 
-# to do : umkreissuche um den radius nach EV charging station / poi / category = ev station 
-
-
-def stations_near_center(coord):
-    r = requests.get('https://places.cit.api.here.com/places/v1/browse?at='+ coord +'&cat=ev-charging-station&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
-    stations = r.json()
-    return stations
-
-
-stations_result = stations_near_center(first_center_spot)
-
-
-station_distance_to_center = stations_result['results']['items'][0]['distance']
-station_openingHours = stations_result['results']['items'][0]['openingHours']
-station_position = stations_result['results']['items'][0]['position']
-station_title = stations_result['results']['items'][0]['title']
-
-
-# testen ob routenanweisungen für korridor geeignet sind 
-# convert waypoint list to string with trennzeichen |
-
-waypoints_with_coordinates.to_string(header=False, index=False)
-
-waypoints_string= ''
-
-for x in range(len(waypoints_with_coordinates)):
-    var1 = waypoints_with_coordinates['lat_wp'][x]
-    var2 = waypoints_with_coordinates['lon_wp'][x]
-    waypoints_string = waypoints_string + str(var1) + ',' + str(var2) + '|'
+stations_coordinates = []
+for x in range(len(stations_along_route['results']['items'])):
+    lat_1 = stations_along_route['results']['items'][x]['position'][0]
+    lon_1 = stations_along_route['results']['items'][x]['position'][1]
+    stations_coordinates.append(str(lat_1) + ',' + str(lon_1))
     
-# to do : delete last '|' 
+distances_station_from_first_center = []
+for x in range(len(stations_coordinates)):
+    coords_1 = stations_coordinates[x]
+    coords_2 = first_center_spot
+    dist = geopy.distance.distance(coords_1, coords_2).km
+    distances_station_from_first_center.append(dist)
+
+    
+stations_coordinates_with_distances_from_center = pd.DataFrame(
+    {
+     'distances_station_from_first_center': distances_station_from_first_center,
+     'stations_coordinates': stations_coordinates
+    })
+
+min_dist = stations_coordinates_with_distances_from_center.loc[stations_coordinates_with_distances_from_center['distances_station_from_first_center'].idxmin()]
+first_station = min_dist['stations_coordinates']
+
+# input = min dist = coord and line number of first station , now get data from station. 
+
+# neuer ansatz: schleife bauen , die eine route berechnet bis zum ersten polyline punkt, checkt ob gefahrene distanz < range of car ist. 
+#  gefahrene distanz darf nicht > range sein. dann nimmt die funktion sich die koordinate von wegpunkt 200 km. 
+# loop durchläuft alle abstände zwischen koordinate und stationen along route. es wird station zurückgegeben mit kleinstem abstand zur station. 
+#wenn größer als range , dann in stationsliste eintrag x-1 (= eine station davor) auswählen == erste ladestation
+
+
+# berechne route 
+
+def route_to_polyline_point(start_coord, destination_coord):
+    r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
+    route = r.json()
+    return route
+
+
+# how long in m is the route ? 
+
+
+# while loop: 
+
+distance_polypoint_to_start = 0
+x = 0
+route_to_polyline_point_length_in_m = 0
+while distance_polypoint_to_start <= 200000:
+    #take polyline punkt 
+    route = route_to_polyline_point(start_coord,str(lat_lon_1[x]))
+    route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
+    distance_polypoint_to_start = route_to_polyline_point_length_in_m
+    x += 1
+    
+lat_lon_1[x]
+
+# data from first station
+
+
+station_openingHours = stations_along_route['results']['items'][x]['openingHours']['text']
+station_position = str(stations_along_route['results']['items'][x]['position'][0])+ ','+ str(stations_along_route['results']['items'][x]['position'][1])
+station_title = stations_along_route['results']['items'][x]['title']
 
 
 
-waypoints = '[52.7074,13.1926|52.7045,13.0661|52.7191,12.9621|52.7636,12.8263|52.7861,12.8000|52.8335,12.7919|52.9002,12.7451|52.9708,12.6311|53.0526,12.5392|53.0867,12.5169|53.1146,12.4687|53.1334,12.4644|53.1415,12.4225|53.1666,12.3722|53.1785,12.3050|53.2570,12.1618|53.2893,12.0618|53.3000,11.9373|53.3316,11.8724|53.3463,11.8190|53.3669,11.7328|53.3725,11.6427|53.4154,11.5505|53.4309,11.4906|53.4342,11.4000|53.4655,11.3370|53.4873,11.2631|53.4860,11.2011|53.5110,10.9647|53.5128,10.8414|53.5495,10.6892|53.5692,10.5155|53.5596,10.4259|53.5682,10.2999|53.5571,10.2020|53.5672,10.1279|53.5534,9.9924]'
-corridor_width = 4000
-size_of_results = 100
 
-def get_stations_along_route(waypoints,corridor_width, size_of_results):
-    r = requests.get('http://places.cit.api.here.com/places/v1/browse?route='+ waypoints +';w='+ str(corridor_width) +'&cat=ev-charging-station&size='+ str(size_of_results) +'&Accept-Language=de-de&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
-    stations = r.json()
-    return stations
+# to do:   check if distance from 1. station to destination is greater than range of car ! 
+# if yes , search next station after the first station! 
+# loop ! 
 
-
-stations_along_route = get_stations_along_route(waypoints,corridor_width, size_of_results)
-
-
-#korridor sehr klein und schauen , welche gefundene station nahe des startpunktes ist (radius suche )
-
-
-
-
-
-
-
-# browse by corridor : 
-#https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&route=[52.5160,13.3771|52.5111,13.3712|52.5355,13.3634|52.5400,13.3704|52.5626,13.3307|52.5665,13.3076|52.6007,13.2806|52.6135,13.2484|52.6303,13.2406|52.6651,13.2410|52.7074,13.1926|52.7045,13.0661|52.7191,12.9621|52.7636,12.8263|52.7861,12.8000|52.8335,12.7919|52.9002,12.7451|52.9708,12.6311|53.0526,12.5392|53.0867,12.5169|53.1146,12.4687|53.1334,12.4644|53.1415,12.4225|53.1666,12.3722|53.1785,12.3050|53.2570,12.1618|53.2893,12.0618|53.3000,11.9373|53.3316,11.8724|53.3463,11.8190|53.3669,11.7328|53.3725,11.6427|53.4154,11.5505|53.4309,11.4906|53.4342,11.4000|53.4655,11.3370|53.4873,11.2631|53.4860,11.2011|53.5110,10.9647|53.5128,10.8414|53.5495,10.6892|53.5692,10.5155|53.5596,10.4259|53.5682,10.2999|53.5571,10.2020|53.5672,10.1279|53.5534,9.9924];w=1000&cat=ev-charging-station&pretty
-# por just browse? https://developer.here.com/documentation/places/topics_api/resource-browse.html
 
 
 # for visualization: 
 # https://developer.here.com/api-explorer/geovisualization/technology_markers/markers-csv-provider
+
+# to do: 
+
+#build some loops
+#integrate security puffer 
+#integrate in temperature
+#integrate battery level at start
+
+temparature = 20.0
+battery_level_at_start = 0.8
+security_puffer_in_km = 50 
+
+
+# to do : 
+
+#put all input values to top !
 
 
