@@ -17,22 +17,7 @@ temperature = round(kelvin - 273.15,0)
 print(temperature)
 
 
-#Geo_Location API
-api_key = 'AIzaSyCSLetZcqVMjiQMdfR7mudMe5bwzWIYzqo'
-location = 'Burgrieden'
-url = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location+'&key='+api_key
-json_data = requests.get(url).json()
-geo_data = json_data['results'][0]['geometry']['location']
 
-
-
-lat = round(geo['lat'],1)
-lng = round(geo['lng'],1)
-
-geo_data = {
-    'lat': lat,
-    'lng': lng,
-}
 
 
 

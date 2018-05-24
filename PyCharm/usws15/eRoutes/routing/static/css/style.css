@@ -1,31 +1,41 @@
 *{
     margin:0px;
     padding:0px;
+}
 
+#screen{
+    height:100vh;
 }
 
 
 #menu{
-    height:800px;
-    width: 40%;
-    float:left;
-    overflow: hidden;
+    width:40%;
 }
 
 #input{
-     padding:20px;
-}
-
-#output{
-     padding:20px;
+    padding:20px;
+    width:40%;
 }
 
 #navigation{
-    height:700px;
-    width: 810px;
     background-color: lightgrey;
-    float: left;
+    position: absolute;
+    top:55px; right: 0; bottom: 0; left:40%;
 }
+
+#navigation-map{
+    height:100%;
+    width:100%;
+    background-color:black;
+}
+
+
+#output{
+    padding:20px;
+    width:40%;
+}
+
+
 
 #navigation2{
     max-height:100%;
@@ -33,19 +43,10 @@
     background-color: lightgrey;
     float: left;
 }
-
-#map{
-    height:700px;
+#static-map{
+    height:100%;
     width:100%;
     background-color:black;
-    float: left;
-}
-
-#map2{
-    height:1000px;
-    width:100%;
-    background-color:black;
-    float: left;
 }
 
 
@@ -60,3 +61,15 @@
     display:none;
     visibility:hidden;
 }
+
+
+
+#container {
+  margin: 20px;
+  width: 400px;
+  height: 8px;
+  position: relative;
+}
+
+
+

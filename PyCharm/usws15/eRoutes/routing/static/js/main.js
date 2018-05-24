@@ -67,25 +67,11 @@ function update_map(value){
 }
 
 
-
-// Submit post on submit
-$('#post-form').on('submit', function(event){
-    event.preventDefault();
-    console.log("form submitted!")  // sanity check
-    create_post();
-});
-
-// AJAX for posting
-function create_post() {
-    console.log("create post is working!") // sanity check
-    console.log($('#start').val())
+function showLoadingImg() {
+    //alert("loading");
+    //document.getElementById('form-load-img').style.display = 'block';
+    $(".loading").css("display", "block");
 };
-
-
-
-
-
-
 
 
 //CSRF_TOKEN UPDATE

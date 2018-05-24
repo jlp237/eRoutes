@@ -1,54 +1,48 @@
 {% block content %}
 
-    <style>
-      #map {
-        height: 100%;
-      }
-    </style>
-
 <div id ="navigation">
-    <div id = "map"></div>
+    <div id = "navigation-map"></div>
 </div>
 
+<script>
+  function initMap() {
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    var map = new google.maps.Map(document.getElementById('navigation-map'), {
+      zoom: 7,
 
-    <script>
-      function initMap() {
-        var directionsService = new google.maps.DirectionsService;
-        var directionsDisplay = new google.maps.DirectionsRenderer;
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 7,
-
-          center: {lat: 53.5, lng: 9.9}
-        });
-        directionsDisplay.setMap(map);
+      center: {lat: 53.5, lng: 9.9}
+    });
+    directionsDisplay.setMap(map);
+    calculateAndDisplayRoute(directionsService, directionsDisplay);
+    //setInterval(function() {
         calculateAndDisplayRoute(directionsService, directionsDisplay);
-        //setInterval(function() {
-            calculateAndDisplayRoute(directionsService, directionsDisplay);
-        //}, 3000);
+    //}, 3000);
 
-      }
+  }
 
-      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-        directionsService.route({
-          origin: document.getElementById('start').value,
-          destination: document.getElementById('destination').value,
-          travelMode: 'DRIVING'
-        }, function(response, status) {
-          if (status === 'OK') {
-             // $( '.start_btn' ).text("Start");
-              //$(".start_btn").prop("disabled", false);
-            directionsDisplay.setDirections(response);
-          } else {
-              //ERROR --> block start button
-              //$( '.start_btn' ).text("Select valid start and destination");
-              //$(".start_btn").prop("disabled", true);
-            //window.alert('Directions request failed due to ' + status);
-          }
-        });
+  function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+    directionsService.route({
+      origin: document.getElementById('start').value,
+      destination: document.getElementById('destination').value,
+      travelMode: 'DRIVING'
+    }, function(response, status) {
+      if (status === 'OK') {
+         // $( '.start_btn' ).text("Start");
+          //$(".start_btn").prop("disabled", false);
+        directionsDisplay.setDirections(response);
+      } else {
+          //ERROR --> block start button
+          //$( '.start_btn' ).text("Select valid start and destination");
+          //$(".start_btn").prop("disabled", true);
+        //window.alert('Directions request failed due to ' + status);
       }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0&callback=initMap">
-    </script>
+    });
+  }
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0&callback=initMap">
+</script>
 
 
 {% endblock %}

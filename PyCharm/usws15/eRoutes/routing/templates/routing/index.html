@@ -2,8 +2,8 @@
 
 {% block content %}
 
-
-<div id = "menu">
+<img src='/static/img/Porsche-Mission-E.jpg' style="display:none;" id="form-load-img"/>
+<div class="loading" id="loading">Loading&#8230;</div>
 
 <!-- INPUT -->
     <div id = "input">
@@ -11,7 +11,7 @@
         <hr>
 
 
-         <form action="/output/" method="post" id="post-form">
+         <form action="/output/" onsubmit="showLoadingImg()" method="post" id="post-form">
              {% csrf_token %}
             <div class="row">
               <div class="col-md-6 mb-3">
@@ -57,7 +57,7 @@
               </div>
 
               <div class="col-md-3 mb-3">
-                <label for="battery_status">Battery Status</label>
+                <label for="battery_status">Battery</label>
                 <input type="text" class="form-control" name="battery_status" id="battery_status" value="100" placeholder="100">
                 <div class="invalid-feedback">
                   Zip code required.
@@ -93,7 +93,7 @@
           </form>
 
     </div>
-</div>
+
 
 
 
@@ -101,7 +101,7 @@
 
 
 <!-- Implementation Map -->
-{% include "routing/includes/navigation.html" %}
+{% include "routing/includes/maps.html" %}
 
 
 {% endblock %}
