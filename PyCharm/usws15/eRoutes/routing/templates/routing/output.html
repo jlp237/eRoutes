@@ -9,66 +9,71 @@
             <button class="btn btn-primary btn-lg btn-block" type="submit">Calculate new trip</button>
         </form>
 
-
-
-
     <hr>
 
 <!-- Output -->
+      <input class="hideme" type="text" id="start" value="{{ start }}">
+      <input class="hideme" type="text" id="destination" value="{{ destination }}">
 
-
-
-
-
-
-
-
-
-
-<input class="hideme" type="text" id="start" value="{{ start }}">
-<input class="hideme" type="text" id="destination" value="{{ destination }}">
-
+      <div class="tHead bg-dark text-white">Overview</div>
 <table class="table table-striped">
-
   <tbody>
     <tr>
-      <th>Start</th>
-      <td>{{ start }}</td>
+      <th>Total Cost</th>
+      <td>{{ total_cost }} Euro</td>
     </tr>
     <tr>
-      <th>Destination</th>
-      <td>{{ destination }}</td>
+      <th>Money saved*</th>
+      <td>{{ money_saved }} Euro</td>
     </tr>
     <tr>
-      <th>Car</th>
-      <td>{{ car }}</td>
-    </tr>
-      <tr>
-      <th>Driving Style</th>
-      <td>{{ driving_style }}</td>
+      <th>Distance</th>
+      <td>{{ distance }} km</td>
     </tr>
     <tr>
-      <th>Battery Status</th>
-      <td>{{ battery_status }}</td>
-    </tr>
-    <tr>
-      <th>Outside temperature</th>
-      <td>{{ temperature }}</td>
-    </tr>
-      <tr>
-      <th>Location</th>
-      <td>{{ geo_coordinates }}</td>
+      <th>Temperature Start</th>
+      <td>{{ temperature_start }} Celcius</td>
     </tr>
         <tr>
-      <th>Distance</th>
-      <td>{{ distance }}</td>
+      <th>Temperature Destination</th>
+      <td>{{ temperature_destination }} Celcius</td>
     </tr>
-
-
   </tbody>
 </table>
 
 
+      <div class="tHead bg-dark text-white">Charging Stations</div>
+<table class="table table-striped">
+  <tbody>
+    <tr>
+      <th>Station 1</th>
+      <td>Shell<br>Hauptstrasse 33, Köln<br>55ct per kwh</td>
+    </tr>
+    <tr>
+      <th>Station 2</th>
+      <td>GreenPower<br>Rue de Nation 144/2, Paris<br>30ct per kwh</td>
+    </tr>
+  </tbody>
+</table>
+
+
+      <div class="tHead bg-dark text-white">Estimated Time</div>
+<table class="table table-striped">
+  <tbody>
+    <tr>
+      <th>Driving Time</th>
+      <td>9:32 h</td>
+    </tr>
+    <tr>
+      <th>Charging Time</th>
+      <td>2:04 h</td>
+    </tr>
+      <tr>
+      <th>Waiting Time</th>
+      <td>0:33 h</td>
+    </tr>
+  </tbody>
+</table>
 
 
 </div>

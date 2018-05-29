@@ -60,29 +60,46 @@ def output(request):
         battery_status = request.POST.get('battery_status', 'leer')
 
         distance = get_direction_data(start, destination)
-        temperature = get_weather(start)
+        temperature_start = get_weather_start(start)
+        temperature_destination = get_weather_destination(destination)
         geo_coordinates = get_geo_data(start)
+
+        total_cost = round((distance / 1000) * 1.6 * 0.025, 2)
+        money_saved = round(((distance / 1000) * 1.6 * 0.13) - total_cost, 2)
+
+        distance = round(distance / 1000, 1)
 
         return render(request, 'routing/output.html', {'start': start,
                                                        'destination': destination,
                                                        'car': car,
                                                        'driving_style': driving_style,
                                                        'battery_status': battery_status,
-                                                       'temperature': temperature,
+                                                       'temperature_start': temperature_start,
+                                                       'temperature_destination': temperature_destination,
                                                        'geo_coordinates': geo_coordinates,
                                                        'distance': distance,
+                                                       'total_cost': total_cost,
+                                                       'money_saved': money_saved,
                                                        })
     else:
         return render(request, 'routing/output.html')
 
 
-def get_weather(start):
+def get_weather_start(start):
     api_address = 'http://api.openweathermap.org/data/2.5/weather?appid=31d7b827392ab249e871954306d44d04&q='
     url = api_address + start
     json_data = requests.get(url).json()
     kelvin = json_data['main']['temp']
-    temperature = round(kelvin - 273.15, 0)
-    return temperature
+    temperature_start = round(kelvin - 273.15, 0)
+    return temperature_start
+
+def get_weather_destination(destination):
+    api_address = 'http://api.openweathermap.org/data/2.5/weather?appid=31d7b827392ab249e871954306d44d04&q='
+    url = api_address + destination
+    json_data = requests.get(url).json()
+    kelvin = json_data['main']['temp']
+    temperature_destination = round(kelvin - 273.15, 0)
+    return temperature_destination
 
 
 def get_geo_data(start):
@@ -103,7 +120,7 @@ def get_direction_data(start, destination):
 
     routes = json_data['routes']
     legs = routes[0]['legs']
-    legs_distance = legs[0]['distance']['text']
+    legs_distance = legs[0]['distance']['value']
     return legs_distance
 
 
