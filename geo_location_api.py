@@ -22,3 +22,10 @@ geo_data = {
     'lat': lat,
     'lng': lng,
 }
+
+
+
+x = [0,1,2]
+
+if len(x) > 2:
+     z = x[1:-1]

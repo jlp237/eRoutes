@@ -4,10 +4,12 @@ import pandas as pd
 from django.http import JsonResponse
 from django.http import HttpResponse
 import json
+import geopy.distance
 #import ajax_handler
 
 
 def index(request):
+    # Get list of all cars from csv
     cars_frame = pd.read_csv("C:/Users/David/Desktop/eCars.csv", sep=';')
     cars_list = cars_frame["Car"].tolist()
     return render(request, 'routing/index.html', {"cars_list": cars_list})
@@ -18,21 +20,11 @@ def routing(request):
 
 
 def team(request):
-    city = ''
-    form = ''
-    if request.method == 'POST':
-        city = request.POST.get('city', 'leer')
-        form = request.POST.get('city2', 'leer')
-    return render(request, 'routing/team.html', {'car': [city, form, 'Toyotoa', ],
-                                                 'style': ['Fast', 'Average', 'Slow', ],
-                                                 'form': form, 'city': city, })
+    return render()
 
 
 def algorithm(request):
-    # Get list of all cars from csv
-    cars_frame = pd.read_csv("C:/Users/David/Desktop/eCars.csv", sep=';')
-    cars_list = cars_frame["Car"].tolist()
-    return render(request, 'routing/algorithm.html', {"cars_list": cars_list})
+    return render()
 
 
 def search(request):
@@ -83,11 +75,6 @@ def output(request):
 
 
 
-        #distance = direction_json['legs_distance']
-        #waypoints = waypoints_x['legs_distance']
-
-        #resp_dict = json.loads(resp_str)
-
         temperature_start = get_weather_start(start)
         temperature_destination = get_weather_destination(destination)
         geo_coordinates = get_geo_data(start)
@@ -113,7 +100,10 @@ def output(request):
     else:
         return render(request, 'routing/output.html')
 
+
 ######################## APIs #######################
+
+
 def get_weather_start(start):
     api_address = 'http://api.openweathermap.org/data/2.5/weather?appid=31d7b827392ab249e871954306d44d04&q='
     url = api_address + start
@@ -141,22 +131,27 @@ def get_geo_data(start):
     return geo_data
 
 
-#
 def get_direction_data(start, destination):
     api_key = 'AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0'
     endpoint = 'https://maps.googleapis.com/maps/api/directions/json?'
-    waypoint_array = ["Frankfurt", "München", "Paris"]
+    #waypoint_array = ["Frankfurt", "München", "Paris"]
+    waypoints = ""
 
-    # create waypoints strings
-    waypoint_counter = 1
-    waypoint_map_string = ""
-    waypoint_request_string = ""
-    for waypoint in waypoint_array:
-        waypoint_map_string += 'location' + str(waypoint_counter) + '=' + waypoint + '&'
-        waypoint_request_string += waypoint + '|'
-        waypoint_counter += 1
-    waypoints_return = waypoint_map_string[:-1]
-    waypoints = waypoint_request_string[:-1]
+    range_of_car = 250000
+    waypoint = complete_route(start, destination, range_of_car)
+    if len(waypoint) > 2:
+        waypoint_array = waypoint[1:-1]
+
+        # create waypoints strings
+        waypoint_counter = 1
+        waypoint_map_string = ""
+        waypoint_request_string = ""
+        for waypoint in waypoint_array:
+            waypoint_map_string += 'location' + str(waypoint_counter) + '=' + waypoint + '&'
+            waypoint_request_string += waypoint + '|'
+            waypoint_counter += 1
+        waypoints_return = waypoint_map_string[:-1]
+        waypoints = waypoint_request_string[:-1]
 
     # make request for routing json
     nav_request = 'origin={}&destination={}&waypoints={}&key={}'.format(start, destination, waypoints, api_key)
@@ -201,3 +196,174 @@ def get_car_data(request):
 
 
 ######################## ALGORITHM #######################
+
+# 1. all neccessary functions are listed here:
+
+# a geocoder that translates an address or given place from a string into coordinates
+
+def geocoder(place):
+    r = requests.get(
+        'https://geocoder.cit.api.here.com/6.2/geocode.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&searchtext=' + place)
+    place_geo = r.json()
+    latitude = place_geo['Response']['View'][0]['Result'][0]['Location']['NavigationPosition'][0]['Latitude']
+    longitude = place_geo['Response']['View'][0]['Result'][0]['Location']['NavigationPosition'][0]['Longitude']
+    coordinates = str(latitude) + ',' + str(longitude)
+    return coordinates
+
+
+# an api request that returns a route between two given waypoints
+
+def here_route(start_coord, destination_coord):
+    r = requests.get(
+        'https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&waypoint0=' + start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
+    route = r.json()
+    return route
+
+
+# an api request that returns the shape of a route between two given waypoints as an object with many many coordinates
+
+def route_shape(start_coord, destination_coord):
+    r = requests.get(
+        'https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0=' + start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:enabled&routeattributes=shape&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
+    route = r.json()
+    return route
+
+
+# an api request that returns all stations along a route in specified corridor around the route
+
+def get_stations_along_route(string_route_shapes, corridor_width, size_of_results):
+    r = requests.get(
+        'https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&route=' + string_route_shapes + ';w=' + str(
+            corridor_width) + '&cat=ev-charging-station&size=' + str(size_of_results))
+    stations = r.json()
+    return stations
+
+
+def complete_route(start, destination, range_of_car):
+    # api call for geocoding strings into coordinates
+    start_coord = geocoder(start)
+    destination_coord = geocoder(destination)
+    list_of_waypoints = []
+    list_of_waypoints.append(start_coord)
+    # api call for route calculation
+    print("1")
+    route = here_route(start_coord, destination_coord)
+    trip_length_in_m = (route['response']['route'][0]['summary']['distance'])
+    if trip_length_in_m > range_of_car:
+        # api call for getting the shape of route
+        route_poly_shape = route_shape(start_coord, destination_coord)
+        # get lat/ lon of route shape
+        polyline_coordinates = []
+        for x in range(len(route_poly_shape['response']['route'][0]['shape'])):
+            lat_lon = route_poly_shape['response']['route'][0]['shape'][x]
+            polyline_coordinates.append(lat_lon)
+        # delete every second shape several times to reduce size until size > 160
+        print("2")
+        while len(polyline_coordinates) > 160:
+            del polyline_coordinates[::2]
+        # convert Polyline to string for api call
+        string_route_shape = '|'.join(polyline_coordinates)
+        string_route_shape = '[' + string_route_shape + ']'
+        # set corridor width and result size then parse shape to corridor api and get the stations along the route
+        corridor_width = 2000
+        size_of_results = 200
+        stations_along_route = get_stations_along_route(string_route_shape, corridor_width, size_of_results)
+        # create list with all coordinates of the found stations
+        stations_coordinates = []
+        for x in range(len(stations_along_route['results']['items'])):
+            lat_1 = stations_along_route['results']['items'][x]['position'][0]
+            lon_1 = stations_along_route['results']['items'][x]['position'][1]
+            stations_coordinates.append(str(lat_1) + ',' + str(lon_1))
+        # calculating how many stations needed to be found during the trip.
+        print("3")
+        loops = int((trip_length_in_m / range_of_car))
+        # select the first guess for a polyline point by dividing the list of polyline points by the rounded number of loops
+        first_polyline_point = int((len(polyline_coordinates)) / loops)
+        # loop for all stations during trip
+        a = 1
+        print("4")
+        while a <= (loops):
+            distance_polypoint_to_start = 0
+            # loop to find polypoint on route after range of car
+            # calculate route between start and polyline point
+            print(first_polyline_point)
+            route = here_route(start_coord, polyline_coordinates[first_polyline_point])
+            # get distance
+            route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
+            # raise counter by distance of route
+            distance_polypoint_to_start = route_to_polyline_point_length_in_m
+            print(distance_polypoint_to_start)
+
+            if distance_polypoint_to_start >= range_of_car:
+                first_polyline_point = int(first_polyline_point / 2)
+                distance_polypoint_to_start = 0
+                print(distance_polypoint_to_start)
+
+                print("if")
+                print(first_polyline_point)
+                # get route
+                route = here_route(start_coord, polyline_coordinates[first_polyline_point])
+                # get distance
+                route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
+                # raise counter by distance of route
+                distance_polypoint_to_start = route_to_polyline_point_length_in_m
+
+                first_polyline_point += 2
+
+
+            else:
+                # raise counter for next polyline point
+                first_polyline_point += 2
+                print("else")
+                print(first_polyline_point)
+            while distance_polypoint_to_start <= range_of_car and first_polyline_point <= int(
+                    len(polyline_coordinates)):
+                route = here_route(start_coord, polyline_coordinates[first_polyline_point])
+                # get distance
+                route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
+                # raise counter by distance of route
+                distance_polypoint_to_start = route_to_polyline_point_length_in_m
+                first_polyline_point += 2
+                print("while")
+                print(first_polyline_point)
+                print(distance_polypoint_to_start)
+            # get the calculated polyline point
+            first_found_polypoint = polyline_coordinates[first_polyline_point]
+            # calculate distances from polyline point to all stations along route, take the nearest station
+            print("5")
+            distances_station_from_found_polypoint = []
+            for z in range(len(stations_coordinates)):
+                coords_1 = stations_coordinates[z]
+                coords_2 = first_found_polypoint
+                dist = geopy.distance.distance(coords_1, coords_2).km
+                distances_station_from_found_polypoint.append(dist)
+            stations_coordinates_with_distances_station_from_found_polypoint = pd.DataFrame(
+                {'distances_station_from_found_polypoint': distances_station_from_found_polypoint,
+                 'stations_coordinates': stations_coordinates})
+            row_of_station = stations_coordinates_with_distances_station_from_found_polypoint[
+                'distances_station_from_found_polypoint'].idxmin()
+
+            print("6")
+            # get data from station
+            # station_openingHours = stations_along_route['results']['items'][row_of_station]['openingHours']['text']
+            station_position = str(stations_along_route['results']['items'][row_of_station]['position'][0]) + ',' + str(
+                stations_along_route['results']['items'][row_of_station]['position'][1])
+            # station_title = stations_along_route['results']['items'][row_of_station]['title']
+            list_of_waypoints.append(station_position)
+            start_coord = station_position
+            print(first_polyline_point)
+            print(a)
+            first_polyline_point = int(first_polyline_point * 1.5)
+            stations_coordinates_with_distances_station_from_found_polypoint = []
+            row_of_station = 0
+            a += 1
+    else:
+        print("no need to carge during this trip. The Battery of the car will last")
+    list_of_waypoints.append(destination_coord)
+    return list_of_waypoints
+
+
+#################################################################################
+# TEST SECTION
+#################################################################################
+
