@@ -1,6 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Wed May 23 10:54:30 2018
+
+@author: jan-lukaspflaum
+"""
+
+# neuer ansatz: schleife bauen , die eine route berechnet bis zum ersten polyline punkt, checkt ob gefahrene distanz < range of car ist. 
+#  gefahrene distanz darf nicht > range sein. dann nimmt die funktion sich die koordinate von wegpunkt 200 km. 
+# loop durchläuft alle abstände zwischen koordinate und stationen along route. es wird station zurückgegeben mit kleinstem abstand zur station. 
+#wenn größer als range , dann in stationsliste eintrag x-1 (= eine station davor) auswählen == erste ladestation
+
+
+# for visualization: 
+# https://developer.here.com/api-explorer/geovisualization/technology_markers/markers-csv-provider
+
+# to do: 
+
+#integrate security puffer 
+
+#integrate in temperature
+#integrate battery level at start
+
+temparature = 20.0
+battery_level_at_start = 0.8
+security_puffer_in_km = 50 
+
+
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Mon May 14 23:08:19 2018
 
 @author: jan-lukaspflaum
@@ -105,16 +135,6 @@ def complete_route(fe_start, fe_dest, range_of_car):
 
                 print("if")
                 print(first_polyline_point)
-                # get route
-                route = here_route(start_coord,polyline_coordinates[first_polyline_point])
-                # get distance
-                route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
-                # raise counter by distance of route
-                distance_polypoint_to_start = route_to_polyline_point_length_in_m
-                
-                first_polyline_point += 2
-
-                
             else:
                 # raise counter for next polyline point
                 first_polyline_point += 2
@@ -152,7 +172,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
             start_coord = station_position
             print(first_polyline_point)
             print(a)
-            first_polyline_point = int(first_polyline_point*1.5)
+            first_polyline_point = int((int((len(polyline_coordinates))/loops))*1.5)
             stations_coordinates_with_distances_station_from_found_polypoint = []
             row_of_station = 0
             a += 1
@@ -165,7 +185,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
 # TEST SECTION
 #################################################################################
 
-start = 'Berlin'
-destination = 'Hannover'
-range_of_car = 100000
+start = 'Berlin ,Weserstrasse 12'
+destination = 'Schlossplatz+Stuttgart'
+range_of_car = 200000
 list_of_waypoints = complete_route(start, destination, range_of_car)
