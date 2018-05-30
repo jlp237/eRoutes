@@ -79,13 +79,13 @@ def complete_route(fe_start, fe_dest, range_of_car):
             stations_coordinates.append(str(lat_1) + ',' + str(lon_1))
         # calculating how many stations needed to be found during the trip. 
         print("3")
-        loops = int(trip_length_in_m/range_of_car)
+        loops = int((trip_length_in_m/range_of_car))
         #select the first guess for a polyline point by dividing the list of polyline points by the rounded number of loops
         first_polyline_point = int((len(polyline_coordinates))/loops)
         #loop for all stations during trip
         a = 1
         print("4")
-        while a <= loops:
+        while a <= (loops):
             distance_polypoint_to_start = 0
             # loop to find polypoint on route after range of car
             # calculate route between start and polyline point
@@ -105,6 +105,16 @@ def complete_route(fe_start, fe_dest, range_of_car):
 
                 print("if")
                 print(first_polyline_point)
+                # get route
+                route = here_route(start_coord,polyline_coordinates[first_polyline_point])
+                # get distance
+                route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
+                # raise counter by distance of route
+                distance_polypoint_to_start = route_to_polyline_point_length_in_m
+                
+                first_polyline_point += 2
+
+                
             else:
                 # raise counter for next polyline point
                 first_polyline_point += 2
@@ -142,7 +152,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
             start_coord = station_position
             print(first_polyline_point)
             print(a)
-            first_polyline_point = int((int((len(polyline_coordinates))/loops))*1.5)
+            first_polyline_point = int(first_polyline_point*1.5)
             stations_coordinates_with_distances_station_from_found_polypoint = []
             row_of_station = 0
             a += 1
@@ -155,7 +165,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
 # TEST SECTION
 #################################################################################
 
-start = 'Berlin ,Weserstrasse 12'
-destination = 'Schlossplatz+Stuttgart'
-range_of_car = 200000
+start = 'Berlin'
+destination = 'Hannover'
+range_of_car = 100000
 list_of_waypoints = complete_route(start, destination, range_of_car)
