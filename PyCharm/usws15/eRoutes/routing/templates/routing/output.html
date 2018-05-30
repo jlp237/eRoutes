@@ -4,6 +4,8 @@
 
 
 <!-- INPUT -->
+<div class="scroll">
+
     <div id = "output">
         <form action="/index/">
             <button class="btn btn-primary btn-lg btn-block" type="submit">Calculate new trip</button>
@@ -14,6 +16,7 @@
 <!-- Output -->
       <input class="hideme" type="text" id="start" value="{{ start }}">
       <input class="hideme" type="text" id="destination" value="{{ destination }}">
+      <input class="" type="text" id="waypoints" value="{{ waypoints }}">
 
       <div class="tHead bg-dark text-white">Overview</div>
 <table class="table table-striped">
@@ -62,7 +65,7 @@
   <tbody>
     <tr>
       <th>Driving Time</th>
-      <td>9:32 h</td>
+      <td>{{ driving_time }}</td>
     </tr>
     <tr>
       <th>Charging Time</th>
@@ -75,9 +78,22 @@
   </tbody>
 </table>
 
+  <div class="row">
+        <div class="col-md-6 mb-3">
+          <form action="/index/">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Start Navigation <i class="glyphicon glyphicon-share-alt"></i></button>
+          </form>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <form action="/index/">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Send to Phone <i class="glyphicon glyphicon-send"></i></button>
+          </form>
+        </div>
+  </div>
 
 </div>
-
+</div>
 
     <!-- Implementation Map -->
 {% include "routing/includes/navigation.html" %}

@@ -22,27 +22,108 @@
   }
 
   function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-    directionsService.route({
-      origin: document.getElementById('start').value,
-      destination: document.getElementById('destination').value,
-      travelMode: 'DRIVING'
-    }, function(response, status) {
-      if (status === 'OK') {
-         // $( '.start_btn' ).text("Start");
-          //$(".start_btn").prop("disabled", false);
-        directionsDisplay.setDirections(response);
-      } else {
-          //ERROR --> block start button
-          //$( '.start_btn' ).text("Select valid start and destination");
-          //$(".start_btn").prop("disabled", true);
-        //window.alert('Directions request failed due to ' + status);
-      }
-    });
+
+        waypoint_dict = parseStringToDictionary(document.getElementById('waypoints').value);
+        var waypoint_array = [];
+        counter_waypoints = 0;
+        for(var property in waypoint_dict) {
+            waypoint_array.push(waypoint_dict[property]);
+            //alert(waypoint_dict[property]);
+            counter_waypoints += 1
+        }
+
+        switch (counter_waypoints) {
+            case 0:
+                directionsService.route({
+                origin: document.getElementById('start').value,
+                destination: document.getElementById('destination').value,
+                travelMode: 'DRIVING'
+                }, function(response, status) {
+                  if (status === 'OK') {
+                    directionsDisplay.setDirections(response);
+                  } else {
+                  }
+                });
+                break;
+                break;
+            case 1:
+                directionsService.route({
+                origin: document.getElementById('start').value,
+                destination: document.getElementById('destination').value,
+                waypoints: [{location: waypoint_array[0]}],
+                travelMode: 'DRIVING'
+                }, function(response, status) {
+                  if (status === 'OK') {
+                    directionsDisplay.setDirections(response);
+                  } else {
+                  }
+                });
+                break;
+            case 2:
+                directionsService.route({
+                origin: document.getElementById('start').value,
+                destination: document.getElementById('destination').value,
+                waypoints: [{location: waypoint_array[0]},{location: waypoint_array[1]}],
+                travelMode: 'DRIVING'
+                }, function(response, status) {
+                  if (status === 'OK') {
+                    directionsDisplay.setDirections(response);
+                  } else {
+                  }
+                });
+                break;
+            case 3:
+                directionsService.route({
+                origin: document.getElementById('start').value,
+                destination: document.getElementById('destination').value,
+                waypoints: [{location: waypoint_array[0]},{location: waypoint_array[1]}, {location: waypoint_array[2]}],
+                    travelMode: 'DRIVING'
+                }, function(response, status) {
+                  if (status === 'OK') {
+                    directionsDisplay.setDirections(response);
+                  } else {
+                  }
+                });
+                break;
+
+        }
+        //alert(counter_waypoints)
+       //x = JSON.parse(document.getElementById('waypoints').value);
+
+
   }
+
+
+  function parseStringToDictionary(queryString) {
+    var dictionary = {};
+
+    // Step 1: separate out each key/value pair
+    var parts = queryString.split('&');
+
+    for(var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        // Step 2: Split Key/Value pair
+        var keyValuePair = p.split('=');
+
+        // Step 3: Add Key/Value pair to Dictionary object
+        var key = keyValuePair[0];
+        var value = keyValuePair[1];
+
+        // decode URI encoded string
+        value = decodeURIComponent(value);
+        value = value.replace(/\+/g, ' ');
+
+        dictionary[key] = value;
+    }
+
+    // Step 4: Return Dictionary Object
+    return dictionary;
+}
+
+
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0&callback=initMap">
-</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0&callback=initMap"></script>
 
 
 {% endblock %}

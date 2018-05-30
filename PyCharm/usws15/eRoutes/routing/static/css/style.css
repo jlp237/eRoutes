@@ -1,10 +1,11 @@
 *{
     margin:0px;
     padding:0px;
+    max-height:93vh;
+
 }
 
 #screen{
-    height:100vh;
 }
 
 
@@ -33,6 +34,7 @@
 #output{
     padding:20px;
     width:40%;
+    overflow: auto;
 }
 
 
@@ -43,13 +45,12 @@
     background-color: lightgrey;
     float: left;
 }
+
 #static-map{
     height:100%;
     width:100%;
     background-color:black;
 }
-
-
 
 
 #ex1Slider .slider-selection {
@@ -61,7 +62,6 @@
     display:none;
     visibility:hidden;
 }
-
 
 
 #container {
@@ -76,4 +76,3 @@
     font-size:18px;
 
 }
-
