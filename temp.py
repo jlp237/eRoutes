@@ -189,3 +189,16 @@ start = 'Berlin ,Weserstrasse 12'
 destination = 'Schlossplatz+Stuttgart'
 range_of_car = 200000
 list_of_waypoints = complete_route(start, destination, range_of_car)
+
+#################################################################
+
+
+
+      
+        while route_to_polyline_point_length_in_m < range_of_car:
+            print(divider)
+            first_polyline_point = int((len(polyline_coordinates))/divider)
+            route = here_route(start_coord,polyline_coordinates[first_polyline_point])
+            route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
+            divider = divider*2
+            print(route_to_polyline_point_length_in_m)
