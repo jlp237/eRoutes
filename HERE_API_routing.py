@@ -173,15 +173,21 @@ def complete_route(fe_start, fe_dest, range_of_car):
                 first_polyline_point = int((len(polyline_coordinates)/loops))
             else:
                 print('else 3')
-                first_polyline_point += int((len(polyline_coordinates)/loops)) 
+                first_polyline_point += (int((len(polyline_coordinates)/loops)))
                 
             stations_coordinates_with_distances_station_from_found_polypoint = []
             row_of_station = 0
+            print('first_polyline_point')
+
+            print(first_polyline_point)
             a += 1
     else: 
         print("no need to carge during this trip. The Battery of the car will last")
     list_of_waypoints.append(destination_coord)
+    if len(list_of_waypoints) ==2:
+        list_of_waypoints = []
     print("--- %s seconds ---" % (time.time() - start_time))
+
     return list_of_waypoints
     
 #################################################################################
@@ -189,7 +195,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
 ##########################a#######################################################
 
 start = 'Berlin'
-destination = 'Paris'
+destination = 'Leipzig'
 range_of_car = 200000
 list_of_waypoints = complete_route(start, destination, range_of_car)
 
