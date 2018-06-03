@@ -187,7 +187,6 @@ def complete_route(fe_start, fe_dest, range_of_car):
     if len(list_of_waypoints) ==2:
         list_of_waypoints = []
     print("--- %s seconds ---" % (time.time() - start_time))
-
     return list_of_waypoints
     
 #################################################################################
