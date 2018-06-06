@@ -8,6 +8,10 @@ Created on Tue May 22 13:43:29 2018
 #Routing API
 #https://maps.googleapis.com/maps/api/directions/json?origin=New+York,+NY&destination=Boston,+MA&waypoints=optimize:true|Providence,+RI|Hartford,+CT&key='
 
+import requests
+import pandas as pd
+
+
 def get_direction_data(start, destination):
 
     api_key = 'AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0'
@@ -49,7 +53,8 @@ route = get_direction_data("Berlin", "Madrid")
 
 charging_stations_array = []
 for i in range(len(route['routes'][0]['legs'])):
-    charging_station = route['routes'][0]['legs'][i]['distance']['value']
+    charging_station = route['routes'][0]['legs']
+
     charging_stations_array.append(charging_station)
 
 
@@ -57,8 +62,24 @@ stations = route['routes'][0]['legs'][i]['distance']['text']
 
 time = route['routes'][0]['legs'][0]['duration']['value']
 
+charging_stations_array = []
+for i in range(len(charging_station)):
+    address = charging_station[i]['end_address']
+    distance = charging_station[i]['distance']['text']
+    duration = charging_station[i]['duration']['text']
+    text = address + ';' + distance + ';' + duration 
+    charging_stations_array.append(text)
 
 
+range = "100 km"
+range = range[:-2]
+range_num = int(int(range) * 1.6)
+
+x = (str(charging_station))
+x[1]['end_address']
+
+for waypoint in charging_station:
+    print(waypoint['end_address'])
 
 
 #Total Distance
@@ -76,3 +97,4 @@ for i in range(len(route['routes'][0]['legs'])):
     driving_time_array.append(charging_station)
 
 driving_time = sum(driving_time_array)
+

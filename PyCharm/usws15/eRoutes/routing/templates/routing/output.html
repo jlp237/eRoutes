@@ -23,7 +23,7 @@
   <tbody>
     <tr>
       <th>Total Cost</th>
-      <td>{{ total_cost }} Euro</td>
+      <td>{{ total_cost }} Euro <br> {{ price }}</td>
     </tr>
     <tr>
       <th>Money saved*</th>
@@ -44,20 +44,26 @@
   </tbody>
 </table>
 
-
       <div class="tHead bg-dark text-white">Charging Stations</div>
-<table class="table table-striped">
+      <table class="table table-striped">
   <tbody>
+
+  {% for waypoint in all_waypoints_string %}
     <tr>
-      <th>Station 1</th>
-      <td>Shell<br>Hauptstrasse 33, Köln<br>55ct per kwh</td>
+      <th>Station {{ forloop.counter }}</th>
+      <td>{{ waypoint|linebreaks }}</td>
     </tr>
-    <tr>
-      <th>Station 2</th>
-      <td>GreenPower<br>Rue de Nation 144/2, Paris<br>30ct per kwh</td>
-    </tr>
+  {% endfor %}
+
   </tbody>
 </table>
+
+
+
+
+
+
+
 
 
       <div class="tHead bg-dark text-white">Estimated Time</div>
@@ -65,22 +71,26 @@
   <tbody>
     <tr>
       <th>Driving Time</th>
-      <td>{{ driving_time }}</td>
+      <td>{{ driving_time }} min</td>
     </tr>
     <tr>
       <th>Charging Time</th>
-      <td>2:04 h</td>
+      <td>{{ charging_time }} min</td>
     </tr>
       <tr>
       <th>Waiting Time</th>
-      <td>0:33 h</td>
+      <td>{{ waiting_time }} min</td>
+    </tr>
+     <tr>
+      <th>Total Time</th>
+      <td>{{ total_time }} min</td>
     </tr>
   </tbody>
 </table>
 
   <div class="row">
         <div class="col-md-6 mb-3">
-          <form action="/index/">
+          <form action="https://www.google.com/maps/dir/?api=1&origin=Google+Pyrmont+NSW&destination=QVB&destination_place_id=ChIJISz8NjyuEmsRFTQ9Iw7Ear8&travelmode=walking">
             <button class="btn btn-primary btn-lg btn-block" type="submit">Start Navigation <i class="glyphicon glyphicon-share-alt"></i></button>
           </form>
         </div>
@@ -91,6 +101,7 @@
           </form>
         </div>
   </div>
+
 
 </div>
 </div>
