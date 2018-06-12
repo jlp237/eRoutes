@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun  6 20:16:19 2018
+
+@author: vancura
+"""
+
+import mysql.connector
+import pandas as pd
+connection = mysql.connector.connect(user='dsteiner', password='eMobility2018DS',
+                              host='mobility.f4.htw-berlin.de',
+                              database='electric_vehicles', buffered=True)
+
+def getCarData(car, value):
+    try:
+        cursor = connection.cursor()
+        selectString = ("select battery_capacity_kwh, charge_port,"
+                        " charge_power, comb_cold_weather, comb_mild_weather,"
+                        " fastcharge_port, range_km from vehicles where name = '" + car + "'")
+        cursor.execute(selectString)
+        result = cursor.fetchone()
+        carDataRaw = pd.DataFrame(list(result))
+        carData = carDataRaw.transpose()
+        carData.columns = ["battery_capacity_kwh", "charge_port", "charge_power", 
+                             "comb_cold_weather", "comb_mild_weather",
+                             "fastcharge_port", "range_km"]
+        return(carData[value][0])
+    finally:
+        connection.commit()
+        connection.close()
+
+print(getCarData("Audi-e-tron-Sportback", "charge_port"))
