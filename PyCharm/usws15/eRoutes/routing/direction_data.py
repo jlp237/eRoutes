@@ -1,20 +1,31 @@
 import requests
 from .charging_stations import *
+#from car_data import *
 
 
 #100 km standart range ; changes when car is selected
-car_range_num = 200000
 
-def get_direction_data(start, destination):
+
+def get_direction_data(start, destination, car):
     api_key = 'AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0'
     endpoint = 'https://maps.googleapis.com/maps/api/directions/json?'
-    #waypoint_array = ["Frankfurt", "München", "Paris"]
     waypoints = ""
 
-    range_of_car = car_range_num
+    # get all the data about selected car from database
+    range_of_car = get_car_data(car)
+
+
+
+    # get list of best charging stations along the way
     waypoint = complete_route(start, destination, range_of_car)
     if len(waypoint) > 2:
         waypoint_array = waypoint[1:-1]
+
+        url = ''
+        for x in range(len(waypoint)):
+            url += str(waypoint[x]) + '/'
+        google_url = 'https://www.google.com/maps/dir/' + url
+
 
         # create waypoints strings
         waypoint_counter = 1
@@ -37,5 +48,12 @@ def get_direction_data(start, destination):
     data = {
         'routes': routes,
         'waypoints_return': waypoints_return,
+        'google_url': google_url,
     }
     return data
+
+
+def get_car_data(car):
+    # PLACEHOLDER DB QUERY
+    car_range_num = 200000
+    return car_range_num

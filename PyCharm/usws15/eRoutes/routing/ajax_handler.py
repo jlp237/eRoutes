@@ -3,11 +3,10 @@ from django.http import JsonResponse
 from django.http import HttpResponse
 import json
 
-from .ajax_handler import *
-
 def get_car_data(request):
     if request.method == 'GET':
         car_model = request.GET.get('car_model')
+        #cars_frame = pd.read_csv('/static/csv/eCars.csv', sep=';')
         cars_frame = pd.read_csv("C:/Users/David/Desktop/eCars.csv", sep=';')
         frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
 

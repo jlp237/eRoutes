@@ -61,10 +61,14 @@ def output(request):
         #get car data from database: Input: car
         price = (getStationPrice(50.20286, 11.776482))
 
-        route_json = get_direction_data(start, destination)
+        route_json = get_direction_data(start, destination, car)
 
         # Waypoints string
         waypoints = route_json['waypoints_return']
+
+
+        #Routing URL
+        url = route_json['google_url']
 
         # Total Distance
         distance_array = []
@@ -78,7 +82,7 @@ def output(request):
         for i in range(len(route_json['routes'][0]['legs'])):
             charging_station = route_json['routes'][0]['legs'][i]['duration']['value']
             driving_time_array.append(charging_station)
-        driving_time = round(sum(driving_time_array) / 60, 2)
+        driving_time_min = round(sum(driving_time_array) / 60, 0)
 
         # build string of charging station data
         charging_station = route_json['routes'][0]['legs']
@@ -92,9 +96,12 @@ def output(request):
 
         # total time, waiting time, charging time
         count_stations = len(charging_station)-1
-        charging_time = 30 * count_stations
-        waiting_time = 2 * count_stations
-        total_time = driving_time + charging_time + waiting_time
+        charging_time_min = 30 * count_stations
+        waiting_time_min = 2 * count_stations
+        total_time = min_to_hour(driving_time_min + charging_time_min + waiting_time_min)
+        driving_time = min_to_hour(driving_time_min)
+        charging_time = min_to_hour(charging_time_min)
+        waiting_time = min_to_hour(waiting_time_min)
 
         #Weather and geo api call
         temperature_start = get_weather_start(start)
@@ -124,13 +131,16 @@ def output(request):
                                                        'waiting_time': waiting_time,
                                                        'total_time': total_time,
                                                        'price': price,
+                                                       'url': url,
 
                                                        })
     else:
         return render(request, 'routing/output.html')
 
 
-
+def min_to_hour(min):
+    from datetime import timedelta
+    return str(timedelta(minutes = min))[:-3]
 
 
 
