@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 14 23:08:19 2018
+Created on Wed Jun  6 10:23:00 2018
 
 @author: jan-lukaspflaum
 """
+
+
 import pandas as pd
 import requests
 import geopy.distance
@@ -67,8 +69,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
         # calculating how many stations needed to be found during the trip.
         loops = round((trip_length_in_m/range_of_car))
         # delete every second shape several times to reduce size until size > 4700 characters
-        delete_range = int((len(polyline_coordinates))/(loops+5))
-        del polyline_coordinates[0:delete_range]
+  
         if trip_length_in_m < 600000:
             while len(polyline_coordinates) > 160:
                 print('while1')
@@ -78,6 +79,8 @@ def complete_route(fe_start, fe_dest, range_of_car):
                 print('while2')
                 del polyline_coordinates[::2]
         print('2')
+        print(len(polyline_coordinates))
+
         
         # convert Polyline to string for api call
         string_route_shape = '|'.join(polyline_coordinates)
@@ -85,74 +88,79 @@ def complete_route(fe_start, fe_dest, range_of_car):
         # set corridor width and result size then parse shape to corridor api and get the stations along the route
         corridor_width = 3000
         size_of_results = 300
+        
         stations_along_route = get_stations_along_route(string_route_shape,corridor_width, size_of_results)
         #create list with all coordinates of the found stations
         stations_coordinates = []
         for x in range(len(stations_along_route['results']['items'])):
             lat_1 = stations_along_route['results']['items'][x]['position'][0]
             lon_1 = stations_along_route['results']['items'][x]['position'][1]
-            stations_coordinates.append(str(lat_1) + ',' + str(lon_1))        
+            stations_coordinates.append(str(lat_1) + ',' + str(lon_1))    
+        stations_coordinates = list(dict.fromkeys(stations_coordinates))    
+        dist = int(geopy.distance.distance(stations_coordinates[-1], destination_coord).m )
+        
+        while dist > 50000:
+            segment_route_poly_shape = route_shape(stations_coordinates[-1],destination_coord)
+            # get lat/ lon of route shape 
+            segment_polyline_coordinates = segment_route_poly_shape['response']['route'][0]['shape']
+                # delete every second shape several times to reduce size until size > 4700 characters
+            while len(segment_polyline_coordinates) > 160:
+                print('while1')
+                del segment_polyline_coordinates[::2]            
+            # convert Polyline to string for api call
+            segment_string_route_shape = '|'.join(segment_polyline_coordinates)
+            segment_string_route_shape = '[' + segment_string_route_shape + ']'
+            stations_along_route = get_stations_along_route(segment_string_route_shape,corridor_width, size_of_results)
+            for x in range(len(stations_along_route['results']['items'])):
+                lat_1 = stations_along_route['results']['items'][x]['position'][0]
+                lon_1 = stations_along_route['results']['items'][x]['position'][1]
+                stations_coordinates.append(str(lat_1) + ',' + str(lon_1))    
+            stations_coordinates = list(dict.fromkeys(stations_coordinates))   
+            print("stationsliste " + str(len(stations_coordinates)))
+            dist = int(geopy.distance.distance(stations_coordinates[-1], destination_coord).m )
+            print(dist)
+            
+        
             
         #loop for all stations during trip
-        first_polyline_point = 0
+        first_polyline_point = int((len(polyline_coordinates))/loops)
         a = 1
         while a <= loops:
             print('while3')
-            if a == 1:
-                print('if 1')
-                # select the geocoordinates from a point on the route that equals the range of the car
-                found = False           
-                while found == False:
-                    print('while4')
-                    #route to first point in list:
-                    route = here_route(start_coord,polyline_coordinates[first_polyline_point])
-                    # get distance
-                    route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
-                    if route_to_polyline_point_length_in_m < range_of_car:
-                        first_polyline_point += 2
-                        print('if 2')
-                    else:
-                        print('else1')
-                        found = True
-                        first_polyline_point -= 2
-            else:
-                print('else2')
+            found = False   
+            while found == False:
                 route = here_route(start_coord,polyline_coordinates[first_polyline_point])
                 route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
-                while route_to_polyline_point_length_in_m > range_of_car: 
-                    print('while5')
-                    first_polyline_point -= 2
-                    route = here_route(start_coord,polyline_coordinates[first_polyline_point])
-                    route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
-                    
-                if route_to_polyline_point_length_in_m < range_of_car:
-                    print('if 3')
+                if route_to_polyline_point_length_in_m > range_of_car:
+                    factor_1 = route_to_polyline_point_length_in_m/range_of_car
+                    if factor_1 > 1:
+                        factor_1 = 2-factor_1
+                        first_polyline_point = int (first_polyline_point * factor_1)
+                    if factor_1 >= 2:
+                        factor_1 = 3-factor_1
+                        first_polyline_point = int (first_polyline_point * factor_1)
+                else:
                     while route_to_polyline_point_length_in_m < range_of_car:
-                        print('while6')
+                        print("while 3.5")
                         first_polyline_point += 2
                         route = here_route(start_coord,polyline_coordinates[first_polyline_point])
                         route_to_polyline_point_length_in_m = (route['response']['route'][0]['summary']['distance'])
-                if route_to_polyline_point_length_in_m > range_of_car:
-                    print('if 4')
                     first_polyline_point -= 2
-                    
-                    
+                    found = True
+            
             #get the calculated polyline point
             first_found_polypoint = polyline_coordinates[first_polyline_point]
             # calculate distances from polyline point to all stations along route, take the nearest station
             distances_station_from_found_polypoint = []
             for z in range(len(stations_coordinates)):
-                coords_1 = stations_coordinates[z]
-                coords_2 = first_found_polypoint
-                dist = geopy.distance.distance(coords_1, coords_2).km
+                dist = geopy.distance.distance(stations_coordinates[z], first_found_polypoint).km
                 distances_station_from_found_polypoint.append(dist)
             stations_coordinates_with_distances_station_from_found_polypoint = pd.DataFrame({'distances_station_from_found_polypoint': distances_station_from_found_polypoint,'stations_coordinates': stations_coordinates})
             row_of_station = stations_coordinates_with_distances_station_from_found_polypoint['distances_station_from_found_polypoint'].idxmin()
-            
+            station_position = stations_coordinates_with_distances_station_from_found_polypoint.at[row_of_station,'stations_coordinates']
             # get data from station
             #station_openingHours = stations_along_route['results']['items'][row_of_station]['openingHours']['text']
             #station_title = stations_along_route['results']['items'][row_of_station]['title']
-            station_position = str(stations_along_route['results']['items'][row_of_station]['position'][0])+ ','+ str(stations_along_route['results']['items'][row_of_station]['position'][1])
             route = here_route(start_coord,station_position)
             dist_to_station = (route['response']['route'][0]['summary']['distance'])
             
@@ -160,7 +168,7 @@ def complete_route(fe_start, fe_dest, range_of_car):
                 print('while7')
                 row_of_station -= 1
                 print(row_of_station)
-                station_position = str(stations_along_route['results']['items'][row_of_station]['position'][0])+ ','+ str(stations_along_route['results']['items'][row_of_station]['position'][1])
+                station_position = stations_coordinates_with_distances_station_from_found_polypoint.at[row_of_station,'stations_coordinates']
                 print(station_position)
                 route = here_route(start_coord,station_position)
                 dist_to_station = (route['response']['route'][0]['summary']['distance'])
@@ -168,17 +176,10 @@ def complete_route(fe_start, fe_dest, range_of_car):
                 
             list_of_waypoints.append(station_position)
             start_coord = station_position
-            if a == 1:
-                print('if 5')
-                first_polyline_point = int((len(polyline_coordinates)/loops))
-            else:
-                print('else 3')
-                first_polyline_point += (int((len(polyline_coordinates)/loops)))
-                
+            first_polyline_point += (int((len(polyline_coordinates)/loops)))
             stations_coordinates_with_distances_station_from_found_polypoint = []
             row_of_station = 0
             print('first_polyline_point')
-
             print(first_polyline_point)
             a += 1
     else: 
@@ -194,8 +195,8 @@ def complete_route(fe_start, fe_dest, range_of_car):
 ##########################a#######################################################
 
 start = 'Berlin'
-destination = 'Leipzig'
-range_of_car = 200000
+destination = 'Paris'
+range_of_car = 250000
 list_of_waypoints = complete_route(start, destination, range_of_car)
 
 url = ''
