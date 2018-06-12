@@ -1,10 +1,5 @@
 from django.shortcuts import render
-import requests
-import pandas as pd
-from django.http import JsonResponse
-from django.http import HttpResponse
-import json
-import geopy.distance
+from datetime import timedelta
 
 from .api_handler import *
 from .ajax_handler import *
@@ -58,7 +53,7 @@ def output(request):
         battery_status = request.POST.get('battery_status', 'leer')
 
 
-        #get car data from database: Input: car
+        # get car data from database: Input: car
         price = (getStationPrice(50.20286, 11.776482))
 
         route_json = get_direction_data(start, destination, car)
@@ -67,7 +62,7 @@ def output(request):
         waypoints = route_json['waypoints_return']
 
 
-        #Routing URL
+        # Routing URL
         url = route_json['google_url']
 
         # Total Distance
@@ -103,7 +98,7 @@ def output(request):
         charging_time = min_to_hour(charging_time_min)
         waiting_time = min_to_hour(waiting_time_min)
 
-        #Weather and geo api call
+        # Weather and geo api call
         temperature_start = get_weather_start(start)
         temperature_destination = get_weather_destination(destination)
         geo_coordinates = get_geo_data(start)
@@ -132,15 +127,13 @@ def output(request):
                                                        'total_time': total_time,
                                                        'price': price,
                                                        'url': url,
-
                                                        })
     else:
         return render(request, 'routing/output.html')
 
 
 def min_to_hour(min):
-    from datetime import timedelta
-    return str(timedelta(minutes = min))[:-3]
+    return str(timedelta(minutes=min))[:-3]
 
 
 
