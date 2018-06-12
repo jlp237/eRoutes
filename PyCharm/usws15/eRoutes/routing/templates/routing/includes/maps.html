@@ -1,0 +1,19 @@
+{% block content %}
+
+<div id ="navigation">
+    <div id = "static-map"></div>
+</div>
+
+<script>
+function myMap() {
+    var mapCanvas = document.getElementById("static-map");
+    var mapOptions = {
+        center: new google.maps.LatLng(51.2, 10.5),
+        zoom: 5
+    };
+    var map = new google.maps.Map(mapCanvas, mapOptions);
+}
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4FCbdl49sG32FApM3Y6tznowU_sBqb9U&callback=myMap"></script>
+{% endblock %}

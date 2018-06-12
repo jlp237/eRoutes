@@ -1,0 +1,101 @@
+{% extends "routing/header.html" %}
+
+{% block content %}
+
+
+<!-- INPUT -->
+<div class="scroll">
+
+    <div id = "output">
+        <form action="/index/">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Calculate new trip</button>
+        </form>
+
+    <hr>
+
+<!-- Output -->
+      <input class="hideme" type="text" id="start" value="{{ start }}">
+      <input class="hideme" type="text" id="destination" value="{{ destination }}">
+      <input class="" type="text" id="waypoints" value="{{ waypoints }}">
+
+      <div class="tHead bg-dark text-white">Overview</div>
+<table class="table table-striped">
+  <tbody>
+    <tr>
+      <th>Total Cost</th>
+      <td>{{ total_cost }} Euro</td>
+    </tr>
+    <tr>
+      <th>Money saved*</th>
+      <td>{{ money_saved }} Euro</td>
+    </tr>
+    <tr>
+      <th>Distance</th>
+      <td>{{ distance }} km</td>
+    </tr>
+    <tr>
+      <th>Temperature Start</th>
+      <td>{{ temperature_start }} Celcius</td>
+    </tr>
+        <tr>
+      <th>Temperature Destination</th>
+      <td>{{ temperature_destination }} Celcius</td>
+    </tr>
+  </tbody>
+</table>
+
+
+      <div class="tHead bg-dark text-white">Charging Stations</div>
+<table class="table table-striped">
+  <tbody>
+    <tr>
+      <th>Station 1</th>
+      <td>Shell<br>Hauptstrasse 33, Köln<br>55ct per kwh</td>
+    </tr>
+    <tr>
+      <th>Station 2</th>
+      <td>GreenPower<br>Rue de Nation 144/2, Paris<br>30ct per kwh</td>
+    </tr>
+  </tbody>
+</table>
+
+
+      <div class="tHead bg-dark text-white">Estimated Time</div>
+<table class="table table-striped">
+  <tbody>
+    <tr>
+      <th>Driving Time</th>
+      <td>{{ driving_time }}</td>
+    </tr>
+    <tr>
+      <th>Charging Time</th>
+      <td>2:04 h</td>
+    </tr>
+      <tr>
+      <th>Waiting Time</th>
+      <td>0:33 h</td>
+    </tr>
+  </tbody>
+</table>
+
+  <div class="row">
+        <div class="col-md-6 mb-3">
+          <form action="/index/">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Start Navigation <i class="glyphicon glyphicon-share-alt"></i></button>
+          </form>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <form action="/index/">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Send to Phone <i class="glyphicon glyphicon-send"></i></button>
+          </form>
+        </div>
+  </div>
+
+</div>
+</div>
+
+    <!-- Implementation Map -->
+{% include "routing/includes/navigation.html" %}
+
+{% endblock %}

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun May  6 12:37:15 2018
-
 @author: Jan-Lukas, David, Tobias
 """
 
@@ -53,6 +52,52 @@ t6 = t5.unstack()
 
 #table_transformed = table.set_index([3,0])[1].unstack().rename_axis([None])
 
+#select useful colums
+table_selected = t6[['Battery Capacity', 'Charge Port', 'Charge Power', 
+                                    'Charge Speed', 'Combined - Cold Weather', 'Combined - Mild Weather', 
+                                    'Drive', 'Fastcharge Port', 'Fastcharge Power', 
+                                    'Range', 'Top Speed', 'Total Power', 'Vehicle Consumption', 
+                                    'Acceleration 0 - 62 mph', 
+]]
+
+#save as csv
+table_selected.to_csv('eCars.csv', sep=';', encoding='utf-8')
+
+
+#read csv
+
+x = 'Porsche'
+print(cars_frame[1:])
+
+cars_frame = pd.read_csv('cars.csv',sep=';')
+frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
+car_data = (frame2.loc[x]['Range'])
+car_range = car_data['Range']
+
+#Select all cars in list
+print(frame2['Range'])
+print(cars_frame['Car'])
+
+#Get list of all cars from csv
+import pandas as pd
+cars_frame = pd.read_csv('cars.csv',sep=';')
+cars_list = cars_frame["Car"].tolist()
+range_list = cars_frame["Range"].tolist()
+
+#Get Range from Car X
+import pandas as pd
+x = 'Prosche'
+cars_frame = pd.read_csv('cars.csv',sep=';')
+frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
+car_data = (frame2.loc[x]['Range'])
+
+car_model = 'Bmw'
+cars_frame = pd.read_csv("C:/Users/David/Desktop/cars.csv", sep=';')
+frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
+car_range = (frame2.loc[car_model]['Top Speed'])
+
+
+#table_transformed = table.set_index([3,0])[1].unstack().rename_axis([None])
 #select useful colums
 table_selected = t6[['Battery Capacity', 'Charge Port', 'Charge Power', 
                                     'Charge Speed', 'Combined - Cold Weather', 'Combined - Mild Weather', 

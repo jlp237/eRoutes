@@ -1,0 +1,79 @@
+{% block content %}
+
+<div id ="navigation">
+    <div id = "navigation-map"></div>
+</div>
+
+<script>
+  function initMap() {
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    var map = new google.maps.Map(document.getElementById('navigation-map'), {
+      zoom: 7,
+
+      center: {lat: 53.5, lng: 9.9}
+    });
+    directionsDisplay.setMap(map);
+    calculateAndDisplayRoute(directionsService, directionsDisplay);
+    //setInterval(function() {
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
+    //}, 3000);
+
+  }
+
+  function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+    var waypoint_dict = parseStringToDictionary(document.getElementById('waypoints').value);
+
+    var options = {
+        origin: document.getElementById('start').value,
+        destination: document.getElementById('destination').value,
+        travelMode: 'DRIVING',
+        waypoints: []
+    };
+
+    for(var property in waypoint_dict) {
+        options.waypoints.push({location: waypoint_dict[property]});
+    }
+
+    directionsService.route(options, function(response, status) {
+      if (status === 'OK') {
+        directionsDisplay.setDirections(response);
+      } else {
+      }
+    });
+  }
+
+
+  function parseStringToDictionary(queryString) {
+    var dictionary = {};
+
+    // Step 1: separate out each key/value pair
+    var parts = queryString.split('&');
+
+    for(var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        // Step 2: Split Key/Value pair
+        var keyValuePair = p.split('=');
+
+        // Step 3: Add Key/Value pair to Dictionary object
+        var key = keyValuePair[0];
+        var value = keyValuePair[1];
+
+        // decode URI encoded string
+        value = decodeURIComponent(value);
+        value = value.replace(/\+/g, ' ');
+
+        dictionary[key] = value;
+    }
+
+    // Step 4: Return Dictionary Object
+    return dictionary;
+}
+
+
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0&callback=initMap"></script>
+
+
+{% endblock %}

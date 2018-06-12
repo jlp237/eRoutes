@@ -1,0 +1,32 @@
+{% extends "routing/header.html" %}
+
+{% block content %}
+
+<script>
+$(document).ready(function(){
+    $("select").change(function(){
+        $("input").change();
+    });
+});
+
+function display(value){
+    //alert(value);
+    $("#car_img").html("<img id='theImg' src='/static/img/"+value+".jpg' class='\responsive-img\' style='width:100%;'/>");
+
+
+}
+
+</script>
+<div id="car_img">hi</div>
+
+
+<select class="custom-select d-block w-100" name="car" id="car" onchange="display(this.value)">
+{% for car in cars_list%}
+    <option value="{{ car }}">{{ car }}</option>
+
+{% endfor %}
+
+</select>
+
+
+{% endblock %}
