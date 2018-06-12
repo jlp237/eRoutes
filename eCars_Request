@@ -8,7 +8,7 @@ Created on Wed Jun  6 20:16:19 2018
 
 import mysql.connector
 import pandas as pd
-connection = mysql.connector.connect(user='dsteiner', password='eMobility2018DS',
+connection = mysql.connector.connect(user='USER', password='PASSWORD',
                               host='mobility.f4.htw-berlin.de',
                               database='electric_vehicles', buffered=True)
 
