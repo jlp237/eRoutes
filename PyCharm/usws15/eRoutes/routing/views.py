@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from datetime import timedelta
+import pandas as pd
 
 from .api_handler import *
 from .ajax_handler import *
@@ -16,16 +17,16 @@ def index(request):
     return render(request, 'routing/index.html', {"cars_list": cars_list})
 
 
-def routing(request):
-    return render(request, 'routing/routing.html')
-
-
 def team(request):
-    return render()
+    return render(request, 'routing/team.html')
+
+
+def contact(request):
+    return render(request, 'routing/contact.html')
 
 
 def algorithm(request):
-    return render()
+    return render(request, 'routing/algorithm.html')
 
 
 def search(request):
@@ -54,9 +55,10 @@ def output(request):
 
 
         # get car data from database: Input: car
-        price = (getStationPrice(50.20286, 11.776482))
+        #price = (getStationPrice(50.20286, 11.776482))
+        price = 50
 
-        route_json = get_direction_data(start, destination, car)
+        route_json = get_direction_data(start, destination, car, battery_status, driving_style)
 
         # Waypoints string
         waypoints = route_json['waypoints_return']
@@ -64,6 +66,7 @@ def output(request):
 
         # Routing URL
         url = route_json['google_url']
+        car_range = round(route_json['range_of_car'], 0) / 1000
 
         # Total Distance
         distance_array = []
@@ -127,6 +130,7 @@ def output(request):
                                                        'total_time': total_time,
                                                        'price': price,
                                                        'url': url,
+                                                       'car_range': car_range,
                                                        })
     else:
         return render(request, 'routing/output.html')
@@ -134,7 +138,3 @@ def output(request):
 
 def min_to_hour(min):
     return str(timedelta(minutes=min))[:-3]
-
-
-
-

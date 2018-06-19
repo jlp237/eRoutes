@@ -1,34 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head runat="server">
-    <title></title>
-    <script>
-        function ShowWheel() {
-            document.getElementById("processMessage").style.display="block";
+{% extends "routing/header.html" %}
 
-        }
-    </script>
-</head>
-<body>
-    <form id="form1" runat="server">
-    <div>
-        <asp:Button ID="Button1" runat="server" Text="ClickMe" onclick="Button1_Click" OnClientClick="ShowWheel()" />
-    </div>
-    <div id="processMessage" style="display:none; position:absolute; top:200px; left:300px;">
-                Loading...<br />
-                <br />
-                <img alt="Loading" src="../images/ajax-loader.gif" />
-     </div>
+{% block content %}
 
-    </form>
-</body>
+<strong>TEAM</strong><br>
 
-<script>
-  protected void Button1_Click(object sender, EventArgs e)
-        {
-            //simulate the processing
-            System.Threading.Thread.Sleep(3000);
-        }
-        </script>
-  </body>
-</html>
+
+{% endblock %}

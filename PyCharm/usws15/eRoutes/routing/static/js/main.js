@@ -26,11 +26,11 @@ function display(value) {
             }
 
             //myObj = $.parseJSON(data);
-            $( '#range' ).text(car_array[0]);
-            $( '#battery' ).text(car_array[1]);
-            $( '#acceleration' ).text(car_array[2]);
-            $( '#speed' ).text(car_array[3]);
-            $( '#power' ).text(car_array[4]);
+            $( '#range' ).text(car_array[0] + " km");
+            $( '#battery' ).text(car_array[1]+ " kWh");
+            $( '#acceleration' ).text(car_array[2] + " sec");
+            $( '#speed' ).text(car_array[3] + " km/h");
+            $( '#power' ).text(car_array[4] + " kW");
 
         }
     });
