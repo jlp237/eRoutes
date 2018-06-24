@@ -34,10 +34,18 @@ for x in range(list_length):
 
         #if colum has * or † at the end, delete this symbols
         for row in range(len(next_table)):
+            if next_table[0][row][-4:-1] == ' † *':
+                next_table[0][row] = next_table[0][row][0:-4]
+            if next_table[0][row][-1] == '†':
+                next_table[0][row] = next_table[0][row][0:-2]
             if next_table[0][row][-1] == '*':
                 next_table[0][row] = next_table[0][row][0:-2]
-            if next_table[0][row][-3] == '†':
-                next_table[0][row] = next_table[0][row][0:-4]
+            if next_table[0][row][:11] == 'Charge Time':
+                next_table[0][row] = next_table[0][row][0:12]
+            if next_table[0][row][:15] == 'Fastcharge Time':
+                next_table[0][row] = next_table[0][row][0:16]
+           
+
         
         next_table[3] = cars[x]   
         table = table.append(next_table, ignore_index = True)
@@ -57,140 +65,67 @@ table_selected = t6[['Battery Capacity', 'Charge Port', 'Charge Power',
                                     'Charge Speed', 'Combined - Cold Weather', 'Combined - Mild Weather', 
                                     'Drive', 'Fastcharge Port', 'Fastcharge Power', 
                                     'Range', 'Top Speed', 'Total Power', 'Vehicle Consumption', 
-                                    'Acceleration 0 - 62 mph', 
-]]
-
-#save as csv
-table_selected.to_csv('eCars.csv', sep=';', encoding='utf-8')
-
-
-#read csv
-
-x = 'Porsche'
-print(cars_frame[1:])
-
-cars_frame = pd.read_csv('cars.csv',sep=';')
-frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
-car_data = (frame2.loc[x]['Range'])
-car_range = car_data['Range']
-
-#Select all cars in list
-print(frame2['Range'])
-print(cars_frame['Car'])
-
-#Get list of all cars from csv
-import pandas as pd
-cars_frame = pd.read_csv('cars.csv',sep=';')
-cars_list = cars_frame["Car"].tolist()
-range_list = cars_frame["Range"].tolist()
-
-#Get Range from Car X
-import pandas as pd
-x = 'Prosche'
-cars_frame = pd.read_csv('cars.csv',sep=';')
-frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
-car_data = (frame2.loc[x]['Range'])
-
-car_model = 'Bmw'
-cars_frame = pd.read_csv("C:/Users/David/Desktop/cars.csv", sep=';')
-frame2 = cars_frame.set_index('Car', drop=True, append=False, inplace=False, verify_integrity=False)
-car_range = (frame2.loc[car_model]['Top Speed'])
-
-
-#table_transformed = table.set_index([3,0])[1].unstack().rename_axis([None])
-#select useful colums
-table_selected = t6[['Battery Capacity', 'Charge Port', 'Charge Power', 
-                                    'Charge Speed', 'Combined - Cold Weather', 'Combined - Mild Weather', 
-                                    'Drive', 'Fastcharge Port', 'Fastcharge Power', 
-                                    'Range', 'Top Speed', 'Total Power', 'Vehicle Consumption', 
-                                    'Acceleration 0 - 62 mph', 
+                                    'Acceleration 0 - 62 mph', 'Charge Time ', 'Fastcharge Time ',
+                                    'Battery Useabl'
 ]]
 
 # clean values in column "Charge Port" from nonetypes 
 for i, r in table_selected.iterrows():
-    if isinstance(r[1], float):
+    if not isinstance(r[1], str):
         r[1] = "-"
 # clean values in column "Charge Power" from nonetypes
-    if isinstance(r[2], float):
+    if not isinstance(r[2], str):
         r[2] = "-"
 # clean values in column "Charge Speed" from nonetypes
-    if isinstance(r[3], float):
+    if not isinstance(r[3], str):
         r[3] = "-"
+# clean values in column "Combined - Cold Weather" from nonetypes
+    if not isinstance(r[4], str):
+        r[4] = "-"
+# clean values in column "Combined - Mild Weather" from nonetypes
+    if not isinstance(r[5], str):
+        r[5] = "-"
 # clean values in column "Drive" from nonetypes
-    if isinstance(r[6], float):
+    if not isinstance(r[6], str):
         r[6] = "-"
 # clean values in column "Fastcharge Power" from nonetypes
-    if isinstance(r[8], float):
+    if not isinstance(r[8], str):
         r[8] = "-"
+# clean values in column "Top Speed" from nonetypes
+    if not isinstance(r[10], str):
+        r[10] = "-"
 # clean values in column "Total Power" from nonetypes
-    if isinstance(r[11], float):
+    if not isinstance(r[11], str):
         r[11] = "-"
-# clean values in column "Vehicle Consumption" from nonetypes
-    if isinstance(r[12], float):
-        r[12] = "-"
+# clean values in column "Acceleration 0 - 62 mph" from nonetypes
+    if not isinstance(r[13], str):
+        r[13] = "-"
+# clean values in column "Fastcharge Time" from nonetypes
+    if not isinstance(r[15], str):
+        r[15] = "-"
+# clean values in column "Battery Usabl" from nonetypes
+    if not isinstance(r[16], str):
+        r[16] = "-"
 # clean values in column "Battery Capacity" from "kWh" and convert values to float
     r[0] = float(r[0].replace(" kWh", ""))
 
-# clean values in column "Combined - Cold Weather" from nonetypes (float) and convert values to float
+
 for i, r in table_selected.iterrows():
-    if isinstance(r[4], float):
-        print("Wert: " + str(r[4]))
+    # clean values in column "Combined - Cold Weather" from nonetypes (float) and convert values to float
+    if r[4] == '-':
         r[4] = "0 mi"
-for i, r in table_selected.iterrows():
-    r[4] = round((float(r[4].replace("mi", ""))/0.621371), 2)
-    
-# clean values in column "Combined - Mild Weather" from nonetypes (float) and convert values to float
-for i, r in table_selected.iterrows():
-    if isinstance(r[5], float):
-        print("Wert: " + str(r[5]))
+    r[4] = round((float(r[4].replace("mi", ""))/0.621371), 2) 
+    # clean values in column "Combined - Mild Weather" from nonetypes (float) and convert values to float
+    if r[5] == '-':
         r[5] = "0 mi"
-for i, r in table_selected.iterrows():
     r[5] = round((float(r[5].replace("mi", ""))/0.621371), 2)
-
-# convert values in column "Range" to float
-for i, r in table_selected.iterrows():
+    # convert values in column "Range" to float
     r[9] = round((float(r[9].replace("mi", ""))/0.621371), 2)
-
-# clean values in column "Top Speed" from nonetypes (float) and convert values to float
-for i, r in table_selected.iterrows():
-    if isinstance(r[10], float):
-        print("Wert: " + str(r[10]))
+    # clean values in column "Top Speed" from nonetypes (float) and convert values to float
+    if r[10] == '-':
         r[10] = "0 mph"
-for i, r in table_selected.iterrows():
     r[10] = round((float(r[10].replace("mph", ""))/0.621371), 2)
-
-# clean values in column "Acceleration 0 - 62 mph" from nonetypes (float) and convert values to float
-for i, r in table_selected.iterrows():
-    if isinstance(r[13], float):
-        print("Wert: " + str(r[13]))
+    # clean values in column "Acceleration 0 - 62 mph" from nonetypes (float) and convert values to float
+    if r[13] == '-':
         r[13] = "0 sec"
-for i, r in table_selected.iterrows():
     r[13] = float(r[13].replace("sec", ""))
-
-
-import mysql.connector
-connection = mysql.connector.connect(user='USER', password='PASSWORD',
-                              host='mobility.f4.htw-berlin.de',
-                              database='electric_vehicles')
-
-# try / finally for potential erros in SQL queries
-
-try:
-   cursor = connection.cursor()
-   for i, r in table_selected.iterrows():
-       insertString = ("insert into electric_vehicles.vehicles (name, charge_port, "
-                                              "charge_power, charge_speed, "
-                                              "comb_cold_weather, comb_mild_weather, "
-                                              "drive, fastcharge_port, fastcharge_power, "
-                                              "range_km, top_speed, total_power, "
-                                              "vehicle_consumption, acceleration, "
-                                              "battery_capacity_kwh) values "
-                                              "(%s, %s, %s, %s, %s, %s, %s, %s, %s, "
-                                              "%s, %s, %s, %s, %s, %s)")
-       data = (i, r[1], r[2], r[3], r[4], r[5],
-               r[6], r[7], r[8], r[9], r[10], r[11], r[12], r[13], r[0])
-       cursor.execute(insertString, data)
-       print("Inserting car: " + str(i))
-finally:
-    connection.commit()
-    connection.close()
