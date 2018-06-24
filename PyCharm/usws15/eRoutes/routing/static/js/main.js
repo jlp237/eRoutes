@@ -30,7 +30,7 @@ function display(value) {
             $( '#battery' ).text(car_array[1]+ " kWh");
             $( '#acceleration' ).text(car_array[2] + " sec");
             $( '#speed' ).text(car_array[3] + " km/h");
-            $( '#power' ).text(car_array[4] + " kW");
+            $( '#power' ).text(car_array[4]);
 
         }
     });
