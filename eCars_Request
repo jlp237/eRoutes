@@ -17,16 +17,15 @@ def getCarData(car, value):
         cursor = connection.cursor()
         selectString = ("select battery_capacity_kwh, charge_port,"
                         " charge_power, comb_cold_weather, comb_mild_weather,"
-                        " fastcharge_port, range_km, fastcharge_time,"
-                        " battery_capacity_kwh from vehicles where name = '" + car + "'")
+                        " fastcharge_port, range_km, fastcharge_time"
+                        " from vehicles where name = '" + car + "'")
         cursor.execute(selectString)
         result = cursor.fetchone()
         carDataRaw = pd.DataFrame(list(result))
         carData = carDataRaw.transpose()
         carData.columns = ["battery_capacity_kwh", "charge_port", "charge_power", 
                              "comb_cold_weather", "comb_mild_weather",
-                             "fastcharge_port", "range_km", "fastcharge_time",
-                             "battery_capacity_kwh"]
+                             "fastcharge_port", "range_km", "fastcharge_time"]
         return(carData[value][0])
     finally:
         connection.commit()
