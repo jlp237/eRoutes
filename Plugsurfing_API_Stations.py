@@ -147,7 +147,7 @@ def getStationData (min_lat, max_lat, min_long, max_long):
         print("Inserted " + str(len(stations)) + " stations in database.")
 
 
-# get geodata of Germany from spreadsheet
+# get geodata of Germany from spreadsheet geodata.xlsx
 
 # first part - 4955 stations (loaded)
 #getStationData(47.27011,55.0815,5.866342,8.160230)
@@ -160,41 +160,6 @@ def getStationData (min_lat, max_lat, min_long, max_long):
     
 # fourth part - 1409 stations (loaded)
 #getStationData(47.27011,55.0815,12.74800,15.04189)
-
-
-# get prices from specific station
-        
-geodata_JLP_found = pd.DataFrame(columns=['Name', 'Latitude', 'DifLat', 'Longitude', 'DifLong', 'Charging_per_kwh'])
-
-
-def getStationPrices (lat, long):
-
-    connection = mysql.connector.connect(user='USER', password='PASSWORD',
-                                  host='mobility.f4.htw-berlin.de',
-                                  database='stations')
-    
-    try:
-        cursor = connection.cursor()
-        selectString = ("select name, latitude, longitude, charging_per_kwh from plugsurfing where "
-                                            "latitude > %s and latitude < %s "
-                                            "and longitude > %s and longitude < %s")
-        data = (lat - 0.0005, lat + 0.0005, long - 0.0005, long +0.0005)
-        cursor.execute(selectString, data)
-    finally:
-        connection.close()
-
-    
-    for (name, latitude, longitude, charging_per_kwh) in cursor:
-        if(latitude is not None):
-            return ([name, latitude, latitude - lat, longitude, longitude - long, 
-                     charging_per_kwh])
-        else:
-            break;
-
-counter = 0
-
-
-
 
 # function for providing price of specific station
 
@@ -250,8 +215,3 @@ def getStationPrice (lat, long):
 
     finally:
         connection.close()
-
-# prerequisit -> geodata_JLP imported as Array
-#for i, j in geodata_JLP:
-#    print("Wert " + str(i) + " und " + str(j))
-#    print(getStationPrice(float(i),float(j)))

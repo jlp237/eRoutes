@@ -90,16 +90,15 @@ def get_station_charging_speed (lat, long):
 def get_station_data (geodata):
     
     station_list = []
-    station_data = []
+    stations_data = []
     
     for i in geodata:
         station_list.append(i.split(','))
     
     # search and return prices and charging_speed
     for i, j in station_list:
-        station_data.append([float(i), float(j), get_station_price(float(i), float(j))[0],
-                             get_station_price(float(i), float(j))[1]])
-    
-    return station_data
+        station_data = get_station_price(float(i), float(j))
+        stations_data.append([station_data[0], station_data[1]])    
+    return stations_data
 
 results = get_station_data(my_data_request)
