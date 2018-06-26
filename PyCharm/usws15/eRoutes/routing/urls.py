@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^algorithm/', views.algorithm, name='algorithm'),
     url(r'^contact/', views.contact, name='contact'),
     url(r'^search/$', views.search),
-    url(r'^my_view/', views.my_view, name='my_view'),
+    url(r'^error/$', views.error),
     url(r'^output/', views.output, name='output'),
     url(r'^get_car_data/$', ajax_handler.get_car_data, name='get_car_data'),
     url(r'^get_geo_data/$', views.get_geo_data, name='get_geo_data'),

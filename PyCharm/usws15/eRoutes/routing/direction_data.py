@@ -1,6 +1,7 @@
 import requests
 from .charging_stations import *
 from .api_handler import *
+from .charging_station_prices import *
 #from car_data import *
 
 
@@ -23,11 +24,12 @@ def get_direction_data(start, destination, car, battery_status, driving_style):
 
     print("Adjusted Range: " + str(range_of_car))
 
-
-    # get list of best charging stations along the way
-    #waypoint = complete_route(start, destination, range_of_car)
+    # get list of best charging stations along the way / Class:  Charging_stations.py
     waypoint = complete_route(start, destination, range_of_car, battery_status)
     waypoint_array = []
+
+    charging_station_data = get_station_data(waypoint)
+
 
     if len(waypoint) > 2:
         waypoint_array = waypoint[1:-1]
@@ -65,6 +67,7 @@ def get_direction_data(start, destination, car, battery_status, driving_style):
         'waypoints_return': waypoints_return,
         'google_url': google_url,
         'range_of_car': range_of_car,
+        'charging_station_data': charging_station_data,
     }
     return data
 

@@ -52,6 +52,13 @@
     overflow: auto;
 }
 
+@media screen and (max-width: 1000px) {
+    #output{
+        width: 100%;
+    }
+}
+
+
 
 
 #navigation2{
