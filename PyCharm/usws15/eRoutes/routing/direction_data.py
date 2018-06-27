@@ -2,9 +2,12 @@ import requests
 from .charging_stations import *
 from .api_handler import *
 from .charging_station_prices import *
+from .views import *
 #from car_data import *
+from django.shortcuts import render
 
 
+# this method builds the url for google maps and adjusts the range to driving style
 def get_direction_data(start, destination, car, battery_status, driving_style):
     api_key = 'AIzaSyAonN5q0C_6Vlvm8VGIWPd-vl43vjJqca0'
     endpoint = 'https://maps.googleapis.com/maps/api/directions/json?'
@@ -29,20 +32,20 @@ def get_direction_data(start, destination, car, battery_status, driving_style):
     waypoint_array = []
 
     charging_station_data = get_station_data(waypoint)
+    # render error html if list is empty
+    if len(waypoint) == 0:
+        print("Trip not possible with selected specs : Not enough charging stations")
+        error()
+        # return render('routing/error.html')
 
-
+    # delete start and end waypoint
     if len(waypoint) > 2:
         waypoint_array = waypoint[1:-1]
-
-    #get price for charging station and charging provider
-    #waypoint_prices =
-
 
         url = ''
         for x in range(len(waypoint)):
             url += str(waypoint[x]) + '/'
         google_url = 'https://www.google.com/maps/dir/' + url
-
 
         # create waypoints strings
         waypoint_counter = 1
@@ -76,6 +79,7 @@ import mysql.connector
 import pandas as pd
 
 
+# this method gets the range of the car from the database, taken into consideration the outside temperature
 def get_car_data(car, start):
     connection = mysql.connector.connect(user='dsteiner', password='eMobility2018DS',
                                          host='mobility.f4.htw-berlin.de',
@@ -88,23 +92,20 @@ def get_car_data(car, start):
     else:
         value = 'comb_mild_weather'
 
-
     print("range" +value)
     print("car" + car)
 
     # get all car data from database for selected car
     try:
         cursor = connection.cursor()
-        selectString = ("select battery_capacity_kwh, charge_port,"
-                        " charge_power, comb_cold_weather, comb_mild_weather,"
-                        " fastcharge_port, range_km from vehicles where name = '" + car + "'")
+        selectString = ("select comb_cold_weather, comb_mild_weather,"
+                        " range_km from vehicles where name = '" + car + "'")
         cursor.execute(selectString)
         result = cursor.fetchone()
         carDataRaw = pd.DataFrame(list(result))
         carData = carDataRaw.transpose()
-        carData.columns = ["battery_capacity_kwh", "charge_port", "charge_power",
-                           "comb_cold_weather", "comb_mild_weather",
-                           "fastcharge_port", "range_km"]
+        carData.columns = ["comb_cold_weather", "comb_mild_weather",
+                           "range_km"]
         return (carData[value][0])
     finally:
         connection.commit()

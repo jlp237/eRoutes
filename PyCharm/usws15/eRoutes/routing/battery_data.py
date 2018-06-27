@@ -2,7 +2,7 @@ import mysql.connector
 import pandas as pd
 
 
-
+# this method returns the battery capacity or fastcahrging time of selected car
 def getBatteryData(car, value):
     connection = mysql.connector.connect(user='dsteiner', password='eMobility2018DS',
                                          host='mobility.f4.htw-berlin.de',

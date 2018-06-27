@@ -16,8 +16,8 @@
 <!-- Output -->
       <input class="hideme" type="text" id="start" value="{{ start }}">
       <input class="hideme" type="text" id="destination" value="{{ destination }}">
-      <input class="" type="text" id="waypoints" value="{{ waypoints }}">
-        <input class="" type="text" id="url" value="{{ url }}">
+      <input class="hideme" type="text" id="waypoints" value="{{ waypoints }}">
+      <input class="hideme" type="text" id="url" value="{{ url }}">
 
       <div class="tHead bg-dark text-white">Overview</div>
 <table class="table table-striped">
@@ -79,10 +79,6 @@
       <th>Charging Time</th>
       <td>{{ charging_time }} h</td>
     </tr>
-      <tr>
-      <th>Waiting Time</th>
-      <td>{{ waiting_time }} h</td>
-    </tr>
      <tr>
       <th>Total Time</th>
       <td>{{ total_time }} h</td>
@@ -102,7 +98,7 @@
 
         <div class="col-md-6 mb-3">
           <form action="/index/">
-            <button class="btn btn-primary btn-lg btn-block" type="submit">Send to Phone <i class="glyphicon glyphicon-send"></i></button>
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Export Trip <i class="glyphicon glyphicon-send"></i></button>
           </form>
         </div>
   </div>

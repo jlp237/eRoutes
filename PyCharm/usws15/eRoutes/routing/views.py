@@ -10,13 +10,6 @@ from .direction_data import *
 from .battery_data import *
 
 
-
-def index2(request):
-    # Get list of all cars from csv
-    cars_frame = pd.read_csv("C:/Users/David/Desktop/eCars.csv", sep=';')
-    cars_list = cars_frame["Car"].tolist()
-    return render(request, 'routing/index.html', {"cars_list": cars_list})
-
 def index(request):
     connection = mysql.connector.connect(user='dsteiner', password='eMobility2018DS',
                                              host='mobility.f4.htw-berlin.de',
@@ -32,7 +25,6 @@ def index(request):
         for name in cursor:
             cars_list.append(name[0])
 
-        #cars_list = cars_list[1:]
         return render(request, 'routing/index.html', {"cars_list": cars_list})
 
     finally:
@@ -72,15 +64,11 @@ def output(request):
         driving_style = request.POST.get('driving_style', 'leer')
         battery_status = request.POST.get('battery_status', 'leer')
 
-
         # get all direction and car data from database:
         route_json = get_direction_data(start, destination, car, battery_status, driving_style)
 
         # Price and Provider Data // MISSING charging speed, capacity etc
         price_provider_data = route_json['charging_station_data']
-
-
-
 
         # Waypoints string
         waypoints = route_json['waypoints_return']
@@ -116,46 +104,39 @@ def output(request):
             address2 = charging_station[i]['end_address']
             distance2 = charging_station[i]['distance']['text']
             duration2 = charging_station[i]['duration']['text']
-            #charge_list = price_provider_data[i]
+
+            # charge_list = price_provider_data[i]
             provider = price_provider_data[i][0]
             price_cent = price_provider_data[i][1]
 
-            #level of battery
+            # level of battery
             battery_level = distance_array[i] / car_range
 
-
-
-            #Charging Price (Battery Capacity * battery_level * price_cent
-            charging_price = round((battery_capacity * price_cent) / 1000,2)
+            # charging Price (Battery Capacity * battery_level * price_cent
+            charging_price = round((battery_capacity * price_cent), 2)
             charging_price_list.append(charging_price)
 
-            #charging_time (Charging time * battery_level)
-            charging_time = int(round((int(fastcharging_time) * int(battery_level)) / 1000 ,0))
+            # charging_time (Charging time * battery_level)
+            charging_time = int(round((int(fastcharging_time) * int(battery_level)) / 1000, 0))
             charging_time_list.append(charging_time)
 
-            text = provider + '\n' + str(price_cent) + ' Euro/kWh' + '\n' + address2 + '\n' + distance2 + '\n' + duration2  + '\n' + "Charging Price: " + str(
-                charging_price) + " Euro" + '\n' + "Charging Time: " + str(charging_time) + " min"
-
+            # Build String for one charging station and add to list
+            text = provider + '\n' + address2 + '\n\n' + "Distance: " + distance2 + '\n' + "Driving Time: " + duration2 + '\n' + "Price per kwH: " + str(price_cent) + ' Euro' + '\n' + "Charging Price: " + str(charging_price) + " Euro" + '\n' + "Charging Time: " + str(charging_time) + " min"
             all_waypoints_string.append(text)
 
         # total time, waiting time, charging time
-        count_stations = len(charging_station)-1
-        charging_time_min = 30 * count_stations
-        #charging_time_min = sum(charging_time)
-        waiting_time_min = 2 * count_stations
-        total_time = min_to_hour(driving_time_min + charging_time_min + waiting_time_min)
+        charging_time_min = sum(charging_time_list)
+        total_time = min_to_hour(driving_time_min + charging_time_min)
         driving_time = min_to_hour(driving_time_min)
         charging_time = min_to_hour(charging_time_min)
-        waiting_time = min_to_hour(waiting_time_min)
 
         # Weather and geo api call
         temperature_start = get_weather_start(start)
         temperature_destination = get_weather_destination(destination)
-        #geo_coordinates = get_geo_data(start)
+        # geo_coordinates = get_geo_data(start)
 
         # Calculate Overview Data (total cost, money saved, distance)
-        #total_cost = sum(charging_price_list)
-        total_cost = round((distance / 1000) * 1.6 * 0.025, 2)
+        total_cost = round(sum(charging_price_list), 2)
         money_saved = round(((distance / 1000) * 1.6 * 0.13) - total_cost, 2)
         distance = round(distance / 1000, 1)
 
@@ -173,7 +154,6 @@ def output(request):
                                                        'driving_time': driving_time,
                                                        'all_waypoints_string': all_waypoints_string,
                                                        'charging_time': charging_time,
-                                                       'waiting_time': waiting_time,
                                                        'total_time': total_time,
                                                        'url': url,
                                                        'car_range': car_range,
@@ -181,6 +161,6 @@ def output(request):
     else:
         return render(request, 'routing/output.html')
 
-
+# convert min to days and hour
 def min_to_hour(min):
     return str(timedelta(minutes=min))[:-3]

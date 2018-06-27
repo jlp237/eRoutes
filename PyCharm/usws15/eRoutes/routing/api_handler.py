@@ -1,6 +1,7 @@
 import requests
 
 
+# this method returns the temperature in celsius from the starting point
 def get_weather_start(start):
     try:
         api_address = 'http://api.openweathermap.org/data/2.5/weather?appid=31d7b827392ab249e871954306d44d04&q='
@@ -14,6 +15,7 @@ def get_weather_start(start):
     return temperature_start
 
 
+# this method returns the temperature in celsius from the destination point
 def get_weather_destination(destination):
     try:
         api_address = 'http://api.openweathermap.org/data/2.5/weather?appid=31d7b827392ab249e871954306d44d04&q='
@@ -27,6 +29,7 @@ def get_weather_destination(destination):
     return temperature_destination
 
 
+# this method returns the geolocation from the destination point
 def get_geo_data(start):
     api_key = 'AIzaSyCSLetZcqVMjiQMdfR7mudMe5bwzWIYzqo'
     location = start

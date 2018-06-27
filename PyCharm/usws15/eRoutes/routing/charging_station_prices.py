@@ -48,6 +48,8 @@ def get_station_price(lat, long):
         # requested stations and return the average price
 
         else:
+            #result3 = [0.11, round(float(0.22), 2), 0.33]
+            #return result3
             cursor3 = connection.cursor()
             selectString3 = ("select name, avg(charging_per_kwh) from plugsurfing where "
                              "latitude > %s and latitude < %s "
