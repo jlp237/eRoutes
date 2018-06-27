@@ -95,7 +95,7 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
         # get lat/ lon of route shape 
         polyline_coordinates = route_poly_shape['response']['route'][0]['shape']
         # calculating how many stations needed to be found during the trip.
-        loops = round((trip_length_in_m/range_of_car))
+        loops_static = round((trip_length_in_m/range_of_car))
         # delete every second shape several times to reduce size until size > 4700 characters
         if trip_length_in_m < 600000:
             while len(polyline_coordinates) > 160:
@@ -109,7 +109,7 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
         print("länge polyline coords " + str(len(polyline_coordinates)))
         if trip_length_in_m > 600000:
             corridor_width = 7000
-        incr = int(len(polyline_coordinates)/loops)
+        incr = int(len(polyline_coordinates)/loops_static)
         if incr == len(polyline_coordinates):
             incr = int(incr*(range_of_car/trip_length_in_m))
         stations_coordinates = []
@@ -138,41 +138,48 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
         ###############
         # end of station collecting
         ################
-        first_polyline_point = (int((len(polyline_coordinates))/loops))
+        first_polyline_point = (int((len(polyline_coordinates))/loops_static))
         if first_polyline_point >= len(polyline_coordinates):
             first_polyline_point = int(len(polyline_coordinates))-10            
         a = 1
         station_start = start_coord
         whole_dist = 0
         charged = False
-        while a <= loops:
+        loops_dyn = loops_static
+        while a <= loops_dyn:
             if a == 1 and percentage_range_at_start < 1 and start_range < trip_length_in_m:
+                loops3 = round(((trip_length_in_m-start_range)/range_of_car))
+                if loops_dyn == loops3:
+                    print("no more loops_dyn needed")
+                if loops3 < loops_dyn:
+                    loops_dyn = loops3
                 range_of_car = start_range
-                loops += 1
             if a >1 and percentage_range_at_start < 1 and charged == False:
                 dist_to_dest = trip_length(station_position,destination_coord)
                 loops2 = round((dist_to_dest/real_range))
                 if loops2 ==1:
-                    print("no more loops needed")
+                    print("no more loops_dyn needed")
                     range_of_car = int(real_range*0.8)
                 if loops2 >1:
-                    loops += loops2-1
+                    loops_dyn += loops2-1
                     range_of_car = int(real_range*0.8)
                 charged = True
             if a >= 1 and percentage_range_at_start == 1: 
                range_of_car = int(real_range*0.8) 
             print('berechnung startet für loop ' + str(a))
-            found = False  
+            found = False
             while found == False:
                 route_to_polyline_point_length_in_m = trip_length(station_start,polyline_coordinates[first_polyline_point])
                 print("lenghth to poly point = " + str(route_to_polyline_point_length_in_m))
-                print("fpp = " + str(first_polyline_point))
+                print("fpp = " + str(first_polyline_point))                    
                 if route_to_polyline_point_length_in_m > range_of_car*1.04:
                     factor_1 = range_of_car/route_to_polyline_point_length_in_m
                     #range_between_old_and_new = first_polyline_point - old_polyline_point
                     #add = int(range_between_old_and_new * factor_1)
                     #first_polyline_point = old_polyline_point + add
                     first_polyline_point = int(first_polyline_point *factor_1)
+                    if first_polyline_point < old_polyline_point:
+                        first_polyline_point = old_polyline_point
                 else:
                     if route_to_polyline_point_length_in_m > (range_of_car*0.96) and route_to_polyline_point_length_in_m <= (range_of_car*1.04):
                         found = True
@@ -221,22 +228,31 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
             station_start = station_position
             old_polyline_point = first_polyline_point
             print('old_polyline_point = ' + str(old_polyline_point))
-            first_polyline_point += (int((len(polyline_coordinates)/loops)))
+            first_polyline_point += (int((len(polyline_coordinates)/loops_static)))
             if first_polyline_point >= len(polyline_coordinates):
                 first_polyline_point = (len(polyline_coordinates)-1)
             stations_coordinates_with_distances_station_from_found_polypoint = []
             row_of_station = 0
             print('next first_polyline_point = ' + str(first_polyline_point))
             whole_dist += dist_to_station
-            if a == loops and whole_dist < (trip_length_in_m-range_of_car):
-                loops +=1
+            if a == loops_dyn and whole_dist < (trip_length_in_m-range_of_car):
+                loops_dyn +=1
             if dist_to_station == 0:
-                a = loops+1
+                a = loops_dyn+1
                 list_of_waypoints.append(station_position)
             dist_to_dest_2 = trip_length(station_position,destination_coord)
-            a += 1
+            print('dist to dest  = ' + str(dist_to_dest_2))
+            run = False
+            dist_to_dest_4 = 0            
+            if dist_to_dest_2 == dist_to_dest_4 and run == True:
+                a = loops_dyn+1
+            if dist_to_dest_2 > range_of_car and a == loops_dyn:
+                loops_dyn +=1
+            a += 1    
             if dist_to_dest_2 < range_of_car:
-                a = loops+1
+                a = loops_dyn+1
+            dist_to_dest_4 = dist_to_dest_2
+            run = True
     else: 
         print("no need to carge during this trip. The Battery of the car will last")
     list_of_waypoints.append(destination_coord)
@@ -249,8 +265,8 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
 ##########################a#######################################################
 start = 'Berlin' 
 destination = 'Rom'
-range_of_car = 300000
-percentage_range_at_start = 1
+range_of_car = 161000
+percentage_range_at_start = 0.2
 list_of_waypoints = complete_route(start, destination, range_of_car, percentage_range_at_start)
 url = ''
 for x in range(len(list_of_waypoints)):
