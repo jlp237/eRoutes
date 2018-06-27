@@ -5,7 +5,6 @@ import math
 import mysql.connector
 
 
-
 def get_connection():
     connection = mysql.connector.connect(user='tvancura', password='eMobility2018TV',
                                          host='mobility.f4.htw-berlin.de',
@@ -13,6 +12,7 @@ def get_connection():
     return connection
 
 
+# get station prices by latitude and longitude
 def get_station_price(lat, long):
     connection = get_connection()
 
@@ -46,48 +46,45 @@ def get_station_price(lat, long):
 
         # if there are no results, check the stations close to the
         # requested stations and return the average price
+        # if radius of 2 geopoints around the requested station still
+        # not delivers a specific price, select the avg price of a large range (20)
 
         else:
-            #result3 = [0.11, round(float(0.22), 2), 0.33]
-            #return result3
             cursor3 = connection.cursor()
             selectString3 = ("select name, avg(charging_per_kwh) from plugsurfing where "
                              "latitude > %s and latitude < %s "
                              "and longitude > %s and longitude < %s "
                              "and charging_per_kwh > 0")
-            data3 = (lat - 0.8, lat + 0.8, long - 0.8, long + 0.8)
+            data3 = (lat - 1, lat + 1, long - 1, long + 1)
             cursor3.execute(selectString3, data3)
             tmpResult3 = cursor3.fetchone()
             result3 = [tmpResult3[0], round(tmpResult3[1], 2), '-']
-            return result3;
+
+            if(tmpResult3[0] > 0.01):
+                return result3
+            else:
+                cursor4 = connection.cursor()
+                selectString4 = ("select name, avg(charging_per_kwh) from plugsurfing where "
+                                 "latitude > %s and latitude < %s "
+                                 "and longitude > %s and longitude < %s "
+                                 "and charging_per_kwh > 0")
+                data4 = (lat - 10, lat + 10, long - 10, long + 10)
+                cursor4.execute(selectString4, data4)
+                tmpResult4 = cursor4.fetchone()
+                result4 = [tmpResult4[0], round(tmpResult4[1], 2), '-']
 
 
     finally:
         connection.close()
 
 
-def get_station_charging_speed(lat, long):
-    connection = get_connection()
-
-    try:
-        cursor = connection.cursor()
-        selectString = ("select charging_speed from plugsurfing where "
-                        "latitude > %s and latitude < %s "
-                        "and longitude > %s and longitude < %s "
-                        "and charging_speed <> '0kW'")
-        data = (lat - 0.0005, lat + 0.0005, long - 0.0005, long + 0.0005)
-        cursor.execute(selectString, data)
-        result = cursor.fetchone()
-        return result
-    finally:
-        connection.close()
-
-
+# get station data for a list of specific geodata
 def get_station_data(geodata):
     station_list = []
     stations_data = []
 
     for i in geodata:
+        print("List append with value " + str(i))
         station_list.append(i.split(','))
 
     # search and return prices and charging_speed
@@ -95,5 +92,3 @@ def get_station_data(geodata):
         station_data = get_station_price(float(i), float(j))
         stations_data.append([station_data[0], station_data[1]])
     return stations_data
-
-
