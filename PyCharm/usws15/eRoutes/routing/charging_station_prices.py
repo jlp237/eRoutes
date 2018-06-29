@@ -55,12 +55,12 @@ def get_station_price(lat, long):
                              "latitude > %s and latitude < %s "
                              "and longitude > %s and longitude < %s "
                              "and charging_per_kwh > 0")
-            data3 = (lat - 1, lat + 1, long - 1, long + 1)
+            data3 = (lat - 20, lat + 20, long - 20, long + 20)
             cursor3.execute(selectString3, data3)
             tmpResult3 = cursor3.fetchone()
             result3 = [tmpResult3[0], round(tmpResult3[1], 2), '-']
 
-            if(tmpResult3[0] > 0.01):
+            if(tmpResult3[1] > 0.01):
                 return result3
             else:
                 cursor4 = connection.cursor()
