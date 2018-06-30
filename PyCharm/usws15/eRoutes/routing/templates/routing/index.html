@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<img src='/static/img/Porsche-Mission-E.jpg' style="display:none;" id="form-load-img"/>
+<img src='/static/img/Porsche-Taycan---Mission-E.jpg' style="display:none;" id="form-load-img"/>
 <div class="loading" id="loading">Loading&#8230;</div>
 
 <!-- INPUT -->
@@ -34,7 +34,7 @@
               <div class="col-md-5 mb-3">
                 <label for="car">Car Model</label>
                 <select class="custom-select d-block w-100" name="car" id="car" onchange="display(this.value)">
-                     <option value="Porsche-Mission-E">Porsche-Mission-E</option>
+                     <option value="Porsche-Taycan---Mission-E">Porsche-Taycan---Mission-E</option>
                     {% for car in cars_list%}
                         <option value="{{ car }}">{{ car }}</option>
                     {% endfor %}
