@@ -2,28 +2,19 @@
     margin:0px;
     padding:0px;
     max-height:93vh;
-
 }
 
 
 #menu{
     width:40%;
 }
-@media screen and (max-width: 1000px) {
-    #menu {
-        width: 100%;
-    }
-}
+
 
 #input{
     padding:20px;
     width:40%;
 }
-@media screen and (max-width: 1000px) {
-    #input{
-        width: 100%;
-    }
-}
+
 
 #navigation{
     background-color: lightgrey;
@@ -31,13 +22,7 @@
     top:55px; right: 0; bottom: 0; left:40%;
 }
 
-/* Display the columns below each other instead of side by side on small screens */
-@media screen and (max-width: 1000px) {
-    #navigation {
-        width: 0%;
-        display: block;
-    }
-}
+
 
 #navigation-map{
     height:100%;
@@ -51,14 +36,6 @@
     width:40%;
     overflow: auto;
 }
-
-@media screen and (max-width: 1000px) {
-    #output{
-        width: 100%;
-    }
-}
-
-
 
 
 #navigation2{
@@ -167,5 +144,35 @@
 @media screen and (max-width: 700px) {
     #HTW{
         width: 100%;
+    }
+}
+
+
+#start_btn{
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+@media screen and (max-width: 1000px) {
+    #menu {
+        width: 100%;
+    }
+
+    #input {
+        width: 100%;
+    }
+
+    #navigation {
+        width: 0%;
+        display: block;
+    }
+
+    #output{
+        width: 100%;
+    }
+
+    #map {
+        height: 0%;
+        display: block;
     }
 }
