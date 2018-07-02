@@ -14,7 +14,7 @@ def geocoder(place):
     return coordinates
 
 
-# an api request that returns a route between two given waypointsa
+# an api request that returns a route between two given waypoints
 def here_route(start_coord, destination_coord):
     r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
     route = r.json()
@@ -34,13 +34,13 @@ def get_stations_along_route(string_route_shapes,corridor_width, size_of_results
     stations = r.json()
     return stations
 
-
+# this method returns the trip length in meters
 def trip_length(start_coord,destination_coord):
     route = here_route(start_coord,destination_coord)
     trip_length_in_m = (route['response']['route'][0]['summary']['distance'])
     return trip_length_in_m
 
-
+# this method returns all stations along a small part along the whole route. due to limited results for a request this method gets called more often along very long routes to aggregate all stations. also the stations will be requested in the driving direction and reverse to get more stations.
 def get_station_list(poly_start,polyline_coordinates,stations_coordinates,corridor_width, size_of_results, reverse):
     if reverse == True:
         route_poly_shape = route_shape(polyline_coordinates,poly_start)
@@ -65,7 +65,15 @@ def get_station_list(poly_start,polyline_coordinates,stations_coordinates,corrid
     print("neue stationsliste stationsanzahl = " + str(len(stations_coordinates)))
     return stations_coordinates
 
-
+# this method returns a list with the recommended stations along the route
+# 1. get a route shape of the route
+# 2. get the stations along this route shape
+# 3. search the exact point along the route after x km (x = range of car)
+# 4. search the stations arround this exact point
+# 5. select the nearest station at this exact point and add it to a list of stations
+# 6. iterate along the route until the destination is reached
+# 7. return the list of waypoints
+# 8. if there are not enough stations along the route, return an empty list
 def complete_route(start, destination, range_of_car, percentage_range_at_start):
     # set corridor width and result size then parse shape to corridor api and get the stations along the route
     start_range = int(range_of_car*percentage_range_at_start)

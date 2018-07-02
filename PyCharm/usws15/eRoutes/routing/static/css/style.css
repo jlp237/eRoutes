@@ -160,3 +160,12 @@
     color: grey;
 }
 
+
+#HTW{
+    width:40%;
+}
+@media screen and (max-width: 700px) {
+    #HTW{
+        width: 100%;
+    }
+}

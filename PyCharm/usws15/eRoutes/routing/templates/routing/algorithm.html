@@ -4,17 +4,31 @@
 
 
 <div class="rand">
-<strong>Algorithm</strong><br><br>
+<h2>Algorithm</h2>
+         <br>
+        You are interested how the magic behind the scene happens?  <br>
+        Here you go: <br> <br>
 
-        User Input Start<br>
-        Calculation Route<br>
-        Search for all charging Stations around route<br>
-        Selected best charging Stations<br>
-        Calculate Prices<br>
-        Calculate new Route<br>
-        Calculate Time, Distance<br>
+        1. First, the user types in from where to where he wants to go<br> <br>
+
+        2. After the users selecting the car, driving style and how much the battery of the car is currently charged, <br>the backend starts with pressing the start button.<br> <br>
+
+        3. After calculating the route and getting all the data for the selected car from our database, <br>we search for all charging stations along the route with a maximum distance between 3km and 7km,<br> depending on the distance of the trip. <br><br>
+
+        4. Then we choose the best fitting charging stations for the trip, depending on the weather, <br> car, driving style, plug types and more. <br><br>
+
+        5. For this charging stations we get all the data like the price, address and provider from our database. <br><br>
+
+        6. Following, we calculate the total price, charging time, driving time and more. <br><br>
+
+        7. Finally, we send all the data back to the frontend, load our charging stations into google maps <br>and show everything nicely designed to the user.
+
+        <br><br>
+
+
 
 
 </div>
+
 
 {% endblock %}

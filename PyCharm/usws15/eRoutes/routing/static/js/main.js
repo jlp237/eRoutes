@@ -7,7 +7,7 @@ $(document).ready(function(){
 
 function display(value) {
     //alert(value);
-    $("#car_img").html("<img id='theImg' src='/static/img/" + value + ".jpg' class='\responsive-img\' style='width:100%;height:250px;'/>");
+    $("#car_img").html("<img id='theImg' src='/static/img/" + value + ".jpg' class='\responsive-img\' style='width:100%;'/>");
 
     var car_model = value
 
