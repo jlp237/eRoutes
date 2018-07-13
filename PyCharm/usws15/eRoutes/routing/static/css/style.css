@@ -102,7 +102,7 @@
 
 /* Three columns side by side */
 .column {
-    width: 50%;
+    width: 33%;
     display: inline-block;
     margin-bottom: 16px;
     padding: 0 8px;
