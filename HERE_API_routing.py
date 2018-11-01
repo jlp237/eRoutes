@@ -10,10 +10,10 @@ import requests
 import geopy.distance
 import time
 start_time = time.time()
-# 1. all neccessary functions are listed here: 
+# 1. all neccessary functions are listed here:
 # a geocoder that translates an address or given place from a string into coordinates
 def geocoder(place):
-    r = requests.get('https://geocoder.cit.api.here.com/6.2/geocode.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&searchtext=' + place)
+    r = requests.get('https://geocoder.cit.api.here.com/6.2/geocode.json?app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ&searchtext=' + place)
     place_geo = r.json()
     latitude = place_geo['Response']['View'][0]['Result'][0]['Location']['NavigationPosition'][0]['Latitude']
     longitude = place_geo['Response']['View'][0]['Result'][0]['Location']['NavigationPosition'][0]['Longitude']
@@ -23,21 +23,21 @@ def geocoder(place):
 
 # an api request that returns a route between two given waypointsa
 def here_route(start_coord, destination_coord):
-    r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
+    r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
     route = r.json()
     return route
 
 
-# an api request that returns the shape of a route between two given waypoints as an object with many many coordinates 
+# an api request that returns the shape of a route between two given waypoints as an object with many many coordinates
 def route_shape(start_coord, destination_coord):
-    r = requests.get('https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:enabled&routeattributes=shape&app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA')
+    r = requests.get('https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:enabled&routeattributes=shape&app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ')
     route = r.json()
     return route
 
 
 # an api request that returns all stations along a route in specified corridor around the route
 def get_stations_along_route(string_route_shapes,corridor_width, size_of_results):
-    r = requests.get('https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=jccZtyShstzovgbVxAJn&app_code=5ezWDCQaAJYiXldHFRV6gA&route=' +string_route_shapes + ';w=' + str(corridor_width)+ '&cat=ev-charging-station&size='+ str(size_of_results))
+    r = requests.get('https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ&route=' +string_route_shapes + ';w=' + str(corridor_width)+ '&cat=ev-charging-station&size='+ str(size_of_results))
     stations = r.json()
     return stations
 
@@ -49,7 +49,7 @@ def trip_length(start_coord,destination_coord):
 
 
 def get_station_list(poly_start,polyline_coordinates,stations_coordinates,corridor_width, size_of_results, reverse):
-    if reverse == True: 
+    if reverse == True:
         route_poly_shape = route_shape(polyline_coordinates,poly_start)
     if reverse == False:
         route_poly_shape = route_shape(poly_start, polyline_coordinates)
@@ -65,7 +65,7 @@ def get_station_list(poly_start,polyline_coordinates,stations_coordinates,corrid
         lat_1 = stations_along_route['results']['items'][x]['position'][0]
         lon_1 = stations_along_route['results']['items'][x]['position'][1]
         temp_stations.append(str(lat_1) + ',' + str(lon_1))
-    if reverse == True: 
+    if reverse == True:
         temp_stations.reverse()
     stations_coordinates.extend(temp_stations)
     stations_coordinates = list(dict.fromkeys(stations_coordinates))
@@ -92,7 +92,7 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
     if trip_length_in_m > range_of_car:
         # api call for getting the shape of route
         route_poly_shape = route_shape(start_coord,destination_coord)
-        # get lat/ lon of route shape 
+        # get lat/ lon of route shape
         polyline_coordinates = route_poly_shape['response']['route'][0]['shape']
         # calculating how many stations needed to be found during the trip.
         loops_static = round((trip_length_in_m/range_of_car))
@@ -140,7 +140,7 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
         ################
         first_polyline_point = (int((len(polyline_coordinates))/loops_static))
         if first_polyline_point >= len(polyline_coordinates):
-            first_polyline_point = int(len(polyline_coordinates))-10            
+            first_polyline_point = int(len(polyline_coordinates))-10
         a = 1
         station_start = start_coord
         whole_dist = 0
@@ -164,14 +164,14 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
                     loops_dyn += loops2-1
                     range_of_car = int(real_range*0.8)
                 charged = True
-            if a >= 1 and percentage_range_at_start == 1: 
-               range_of_car = int(real_range*0.8) 
+            if a >= 1 and percentage_range_at_start == 1:
+               range_of_car = int(real_range*0.8)
             print('berechnung startet für loop ' + str(a))
             found = False
             while found == False:
                 route_to_polyline_point_length_in_m = trip_length(station_start,polyline_coordinates[first_polyline_point])
                 print("lenghth to poly point = " + str(route_to_polyline_point_length_in_m))
-                print("fpp = " + str(first_polyline_point))                    
+                print("fpp = " + str(first_polyline_point))
                 if route_to_polyline_point_length_in_m > range_of_car*1.04:
                     factor_1 = range_of_car/route_to_polyline_point_length_in_m
                     #range_between_old_and_new = first_polyline_point - old_polyline_point
@@ -193,7 +193,7 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
                                 h = False
                             route_to_polyline_point_length_in_m = trip_length(station_start,polyline_coordinates[first_polyline_point])
                             print("lenghth to poly point = " + str(route_to_polyline_point_length_in_m))
-                        if h == True: 
+                        if h == True:
                             first_polyline_point -= 8
                             found = True
                         else:
@@ -243,17 +243,17 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
             dist_to_dest_2 = trip_length(station_position,destination_coord)
             print('dist to dest  = ' + str(dist_to_dest_2))
             run = False
-            dist_to_dest_4 = 0            
+            dist_to_dest_4 = 0
             if dist_to_dest_2 == dist_to_dest_4 and run == True:
                 a = loops_dyn+1
             if dist_to_dest_2 > range_of_car and a == loops_dyn:
                 loops_dyn +=1
-            a += 1    
+            a += 1
             if dist_to_dest_2 < range_of_car:
                 a = loops_dyn+1
             dist_to_dest_4 = dist_to_dest_2
             run = True
-    else: 
+    else:
         print("no need to carge during this trip. The Battery of the car will last")
     list_of_waypoints.append(destination_coord)
     if (len(list_of_waypoints) == len(set(list_of_waypoints)))==False:
@@ -263,7 +263,7 @@ def complete_route(start, destination, range_of_car, percentage_range_at_start):
 #################################################################################
 # TEST SECTION
 ##########################a#######################################################
-start = 'Berlin' 
+start = 'Berlin'
 destination = 'Rom'
 range_of_car = 161000
 percentage_range_at_start = 0.2

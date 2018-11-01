@@ -6,7 +6,7 @@ start_time = time.time()
 # 1. all neccessary functions are listed here:
 # a geocoder that translates an address or given place from a string into coordinates
 def geocoder(place):
-    r = requests.get('https://geocoder.cit.api.here.com/6.2/geocode.json?app_id=11ArKOMyKVBeebeeW5Pe&app_code=iy680obDOO-4j-ekZAYZaA&searchtext=' + place)
+    r = requests.get('https://geocoder.cit.api.here.com/6.2/geocode.json?app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ&searchtext=' + place)
     place_geo = r.json()
     latitude = place_geo['Response']['View'][0]['Result'][0]['Location']['NavigationPosition'][0]['Latitude']
     longitude = place_geo['Response']['View'][0]['Result'][0]['Location']['NavigationPosition'][0]['Longitude']
@@ -16,21 +16,21 @@ def geocoder(place):
 
 # an api request that returns a route between two given waypoints
 def here_route(start_coord, destination_coord):
-    r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=11ArKOMyKVBeebeeW5Pe&app_code=iy680obDOO-4j-ekZAYZaA&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
+    r = requests.get('https://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ&waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:disabled')
     route = r.json()
     return route
 
 
 # an api request that returns the shape of a route between two given waypoints as an object with many many coordinates
 def route_shape(start_coord, destination_coord):
-    r = requests.get('https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:enabled&routeattributes=shape&app_id=11ArKOMyKVBeebeeW5Pe&app_code=iy680obDOO-4j-ekZAYZaA')
+    r = requests.get('https://route.api.here.com/routing/7.2/calculateroute.json?waypoint0='+ start_coord + '&waypoint1=' + destination_coord + '&mode=fastest;car;traffic:enabled&routeattributes=shape&app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ')
     route = r.json()
     return route
 
 
 # an api request that returns all stations along a route in specified corridor around the route
 def get_stations_along_route(string_route_shapes,corridor_width, size_of_results):
-    r = requests.get('https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=11ArKOMyKVBeebeeW5Pe&app_code=iy680obDOO-4j-ekZAYZaA&route=' +string_route_shapes + ';w=' + str(corridor_width)+ '&cat=ev-charging-station&size='+ str(size_of_results))
+    r = requests.get('https://places.cit.api.here.com/places/v1/browse/by-corridor?app_id=gluzftw3n4nXg0LnHecw&app_code=xIcTHuY32lAxF3Qh96t2QQ&route=' +string_route_shapes + ';w=' + str(corridor_width)+ '&cat=ev-charging-station&size='+ str(size_of_results))
     stations = r.json()
     return stations
 
